@@ -11,14 +11,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-class BankSavesDataStore
-{
+class BankSavesDataStore {
 	@VisibleForTesting
 	static final String NO_VALUE_STORED = "For if there was no stored config data";
 
 	@ConfigGroup("bankmemory")
-	public interface InternalConfig extends Config
-	{
+	public interface InternalConfig extends Config {
 		@ConfigItem(
 				keyName = "bankSaves",
 				name = "",
@@ -41,20 +39,17 @@ class BankSavesDataStore
 	private final BankSaveParser parser;
 
 	@Inject
-	public BankSavesDataStore(ConfigManager configManager, BankSaveParser parser)
-	{
+	public BankSavesDataStore(ConfigManager configManager, BankSaveParser parser) {
 		this.configInstance = configManager.getConfig(InternalConfig.class);
 		this.parser = parser;
 	}
 
 	/** Returned object is new and safe to keep/modify. */
-	LinkedHashMap<String, BankSave> loadSavedBanks()
-	{
+	LinkedHashMap<String, BankSave> loadSavedBanks() {
 		LinkedHashMap<String, BankSave> result = new LinkedHashMap<>();
 
 		String saveString = configInstance.load();
-		if (NO_VALUE_STORED.equals(saveString))
-		{
+		if (NO_VALUE_STORED.equals(saveString)) {
 			return result;
 		}
 
@@ -62,17 +57,14 @@ class BankSavesDataStore
 		return result;
 	}
 
-	void saveBanks(LinkedHashMap<String, BankSave> saves)
-	{
+	void saveBanks(LinkedHashMap<String, BankSave> saves) {
 		List<BankSave> toSave = new ArrayList<>();
 
 		// Only store the latest 20
 		int start = Math.max(0, saves.size() - 20);
 		int i = 0;
-		for (BankSave save : saves.values())
-		{
-			if (i >= start)
-			{
+		for (BankSave save : saves.values()) {
+			if (i >= start) {
 				toSave.add(save);
 			}
 		}

@@ -22,8 +22,7 @@ import java.util.LinkedHashMap;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BankMemoryPluginTest
-{
+public class BankMemoryPluginTest {
 	@Mock
 	@Bind
 	private ClientToolbar clientToolbar;
@@ -48,8 +47,7 @@ public class BankMemoryPluginTest
 	private final ImmutableList<BankSave.Item> itemSetB = ImmutableList.of(new BankSave.Item(2, 2), new BankSave.Item(3, 3));
 
 	@Before
-	public void before()
-	{
+	public void before() {
 		Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
 		bankMemoryPlugin.setInjector(pluginInjector);
 		when(pluginInjector.getInstance(BankMemoryPanel.class)).thenReturn(pluginPanel);
@@ -60,8 +58,7 @@ public class BankMemoryPluginTest
 	// if logged in, displays no data if none available
 	// if not logged in, displays no data
 	@Test
-	public void testStartup_ifNotLoggedIn_displaysNoData() throws Exception
-	{
+	public void testStartup_ifNotLoggedIn_displaysNoData() throws Exception {
 		when(client.getGameState()).thenReturn(GameState.LOGIN_SCREEN);
 
 		bankMemoryPlugin.startUp();
@@ -72,8 +69,7 @@ public class BankMemoryPluginTest
 	}
 
 	@Test
-	public void testStartup_ifLoggedIn_ifDataAvailable_displaysData() throws Exception
-	{
+	public void testStartup_ifLoggedIn_ifDataAvailable_displaysData() throws Exception {
 		when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
 		when(client.getUsername()).thenReturn("LazyFaith");
 		LinkedHashMap<String, BankSave> existingSave = new LinkedHashMap<>();
@@ -88,8 +84,7 @@ public class BankMemoryPluginTest
 	}
 
 	@Test
-	public void testStartup_ifLoggedIn_ifNoDataAvailable_displaysNoData() throws Exception
-	{
+	public void testStartup_ifLoggedIn_ifNoDataAvailable_displaysNoData() throws Exception {
 		when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
 		when(client.getUsername()).thenReturn("LazyFaith");
 		when(dataStore.loadSavedBanks()).thenReturn(new LinkedHashMap<>());
@@ -117,10 +112,8 @@ public class BankMemoryPluginTest
 		SwingUtilities.invokeAndWait(() -> { /* Do nothing */ });
 	}
 
-	private static class TestBankMemoryPlugin extends BankMemoryPlugin
-	{
-		void setInjector(Injector injector)
-		{
+	private static class TestBankMemoryPlugin extends BankMemoryPlugin {
+		void setInjector(Injector injector) {
 			this.injector = injector;
 		}
 	}

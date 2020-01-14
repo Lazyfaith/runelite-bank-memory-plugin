@@ -30,8 +30,7 @@ import java.util.List;
     name = "Bank Memory",
 	description = "A searchable record of what's in your bank"
 )
-public class BankMemoryPlugin extends Plugin
-{
+public class BankMemoryPlugin extends Plugin {
 	private static final String ICON = "bank_memory_icon.png";
 	private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss, d MMM");
 
@@ -54,8 +53,7 @@ public class BankMemoryPlugin extends Plugin
 	private BankSave latestDisplayedData = null;
 
 	@Override
-	protected void startUp() throws Exception
-	{
+	protected void startUp() throws Exception {
 		existingSavesByUserName = dataStore.loadSavedBanks();
 		panel = injector.getInstance(BankMemoryPanel.class);
 
@@ -69,79 +67,64 @@ public class BankMemoryPlugin extends Plugin
 
 		clientToolbar.addNavigation(navButton);
 
-		if (client.getGameState() == GameState.LOGGED_IN)
-		{
+		if (client.getGameState() == GameState.LOGGED_IN) {
 			updateDisplayForCurrentAccount();
-		} else
-		{
+		} else {
 			panel.displayNoDataMessage();
 		}
 	}
 
-	private void updateDisplayForCurrentAccount()
-	{
+	private void updateDisplayForCurrentAccount() {
 		String currentUsername = client.getUsername();
 		BankSave existingSave = existingSavesByUserName.get(currentUsername);
-		if (existingSave != null)
-		{
-			if (latestDisplayedData != null && !latestDisplayedData.getUserName().equals(currentUsername))
-			{
+		if (existingSave != null) {
+			if (latestDisplayedData != null && !latestDisplayedData.getUserName().equals(currentUsername)) {
 				SwingUtilities.invokeLater(panel::reset);
 			}
 			handleBankSave(existingSave);
-		} else
-		{
+		} else {
 			latestDisplayedData = null;
 			SwingUtilities.invokeLater(panel::displayNoDataMessage);
 		}
 	}
 
 	@Override
-	protected void shutDown()
-	{
+	protected void shutDown() {
 		latestDisplayedData = null;
 		panel.reset();
 		clientToolbar.removeNavigation(navButton);
 	}
 
 	@Subscribe
-	public void onGameStateChanged(GameStateChanged gameStateChanged)
-	{
-		if (gameStateChanged.getGameState() != GameState.LOGGED_IN)
-		{
+	public void onGameStateChanged(GameStateChanged gameStateChanged) {
+		if (gameStateChanged.getGameState() != GameState.LOGGED_IN) {
 			return;
 		}
 		updateDisplayForCurrentAccount();
 	}
 
 	@Subscribe
-	public void onScriptCallbackEvent(ScriptCallbackEvent event)
-	{
+	public void onScriptCallbackEvent(ScriptCallbackEvent event) {
 		// Apparently the event to listen to for opening the bank/changing bank contents
-		if (!"setBankTitle".equals(event.getEventName()))
-		{
+		if (!"setBankTitle".equals(event.getEventName())) {
 			return;
 		}
 		ItemContainer bank = client.getItemContainer(InventoryID.BANK);
-		if (bank == null)
-		{
+		if (bank == null) {
 			return;
 		}
 
 		handleBankSave(createSaveFromBank(bank));
 	}
 
-	private BankSave createSaveFromBank(ItemContainer bank)
-	{
+	private BankSave createSaveFromBank(ItemContainer bank) {
 		net.runelite.api.Item[] contents = bank.getItems();
 		ImmutableList.Builder<BankSave.Item> bankData = ImmutableList.builder();
 
-		for (net.runelite.api.Item item : contents)
-		{
+		for (net.runelite.api.Item item : contents) {
 			int idInBank = item.getId();
 			int canonId = itemManager.canonicalize(idInBank);
-			if (idInBank != canonId)
-			{
+			if (idInBank != canonId) {
 				// It's just a placeholder
 				continue;
 			}
@@ -152,8 +135,7 @@ public class BankMemoryPlugin extends Plugin
 		return new BankSave(client.getUsername(), timeString, bankData.build());
 	}
 
-	private void handleBankSave(BankSave newSave)
-	{
+	private void handleBankSave(BankSave newSave) {
 		existingSavesByUserName.remove(newSave.getUserName());
 		existingSavesByUserName.put(newSave.getUserName(), newSave);
 		dataStore.saveBanks(existingSavesByUserName);
@@ -161,21 +143,17 @@ public class BankMemoryPlugin extends Plugin
 		boolean isDataNew = isItemDataNew(newSave);
 		List<String> names = new ArrayList<>();
 		List<AsyncBufferedImage> icons = new ArrayList<>();
-		if (isDataNew)
-		{
+		if (isDataNew) {
 			// Get all the data we need for the UI on this thread (the game thread)
 			// Doing it on the EDT seems to cause random crashes & NPEs
-			for (BankSave.Item i : newSave.getBankData())
-			{
+			for (BankSave.Item i : newSave.getBankData()) {
 				names.add(itemManager.getItemComposition(i.getItemId()).getName());
 				icons.add(itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1));
 			}
 		}
-		SwingUtilities.invokeLater(() ->
-		{
+		SwingUtilities.invokeLater(() -> {
 			panel.updateTimeDisplay(newSave.getTimeString());
-			if (isDataNew)
-			{
+			if (isDataNew) {
 				assert names.size() == newSave.getBankData().size();
 				assert icons.size() == newSave.getBankData().size();
 				panel.displayItemListings(names, icons);
@@ -184,8 +162,7 @@ public class BankMemoryPlugin extends Plugin
 		latestDisplayedData = newSave;
 	}
 
-	private boolean isItemDataNew(BankSave newSave)
-	{
+	private boolean isItemDataNew(BankSave newSave) {
 		return latestDisplayedData == null || !latestDisplayedData.getBankData().equals(newSave.getBankData());
 	}
 }

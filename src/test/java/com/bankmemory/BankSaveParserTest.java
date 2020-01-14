@@ -15,16 +15,14 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 
 @RunWith(Parameterized.class)
-public class BankSaveParserTest
-{
+public class BankSaveParserTest {
 	@Parameter(value = 0)
 	public String saveString;
 	@Parameter(value = 1)
 	public List<BankSave> bankSaves;
 
 	@Parameters
-	public static Object[][] validData()
-	{
+	public static Object[][] validData() {
 		String oneSaveStr = "name goes here;date goes here;10,1,20,1,5,7,\n";
 		List<BankSave> oneSaveData = list(
 				new BankSave("name goes here", "date goes here", list(item(10, 1), item(20, 1), item(5, 7)))
@@ -46,19 +44,16 @@ public class BankSaveParserTest
 		};
 	}
 
-	private static <T> ImmutableList<T> list(T... items)
-	{
+	private static <T> ImmutableList<T> list(T... items) {
 		return ImmutableList.copyOf(items);
 	}
 
-	private static BankSave.Item item(int id, int quantity)
-	{
+	private static BankSave.Item item(int id, int quantity) {
 		return new BankSave.Item(id, quantity);
 	}
 
 	@Test
-	public void testParseSaveStringAndToSaveStringMethods_givenValidData()
-	{
+	public void testParseSaveStringAndToSaveStringMethods_givenValidData() {
 		BankSaveParser parser = new BankSaveParser();
 
 		assertThat(parser.parseSaveString(saveString), is(bankSaves));
@@ -68,8 +63,7 @@ public class BankSaveParserTest
 	}
 
 	@Test
-	public void testParseSaveString_givenInvalidData()
-	{
+	public void testParseSaveString_givenInvalidData() {
 		String tooFewFields = "name;date";
 		String tooManyFields = "name;date;10,10,5,5;extra";
 		String nonNumericCharactersInItemSegment = "name;date;10,10,spade,5";

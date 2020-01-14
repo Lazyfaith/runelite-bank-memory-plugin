@@ -10,8 +10,7 @@ class BankSave {
 	private final ImmutableList<Item> bankData;
 
 	@Value
-	static class Item
-	{
+	static class Item {
 		private final int itemId;
 		private final int quantity;
 	}

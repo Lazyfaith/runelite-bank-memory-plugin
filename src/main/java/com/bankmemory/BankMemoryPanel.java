@@ -17,11 +17,9 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-class BankMemoryPanel extends PluginPanel
-{
+class BankMemoryPanel extends PluginPanel {
 
-	private enum DisplayState
-	{
+	private enum DisplayState {
 		RESET, SHOWING_NO_DATA, SHOWING_ITEM_LIST
 	}
 
@@ -37,8 +35,7 @@ class BankMemoryPanel extends PluginPanel
 
 	private final List<ListingEntry> listEntriesWithLcItemName = new ArrayList<>();
 
-	protected BankMemoryPanel()
-	{
+	protected BankMemoryPanel() {
 		super(false);
 		setLayout(new BorderLayout(0, PAD));
 		setBorder(BorderFactory.createEmptyBorder(PAD, PAD, PAD, PAD));
@@ -53,11 +50,9 @@ class BankMemoryPanel extends PluginPanel
 		filterField.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));
 		filterField.setBackground(ColorScheme.DARKER_GRAY_COLOR);
 		filterField.setHoverBackgroundColor(ColorScheme.DARK_GRAY_HOVER_COLOR);
-		filterField.getDocument().addDocumentListener(new OnAnyChangeDocumentListener()
-		{
+		filterField.getDocument().addDocumentListener(new OnAnyChangeDocumentListener() {
 			@Override
-			public void onChange(DocumentEvent e)
-			{
+			public void onChange(DocumentEvent e) {
 				itemsScrollPane.getViewport().setViewPosition(new Point(0, 0));
 				updateFiltering();
 			}
@@ -71,8 +66,7 @@ class BankMemoryPanel extends PluginPanel
 		displayNoDataMessage();
 	}
 
-	void displayNoDataMessage()
-	{
+	void displayNoDataMessage() {
 		checkState(SwingUtilities.isEventDispatchThread());
 		reset();
 		add(errorPanel, BorderLayout.NORTH);
@@ -84,8 +78,7 @@ class BankMemoryPanel extends PluginPanel
 	 * Resets filter, resets list data, resets scroll position and removes UI components.
 	 * Indirectly: releases some held objects (by resetting the list).
 	 */
-	void reset()
-	{
+	void reset() {
 		checkState(SwingUtilities.isEventDispatchThread());
 		clearItemList();
 		resetScrolling();
@@ -93,25 +86,21 @@ class BankMemoryPanel extends PluginPanel
 		state = DisplayState.RESET;
 	}
 
-	private void resetScrolling()
-	{
+	private void resetScrolling() {
 		itemsScrollPane.getViewport().setViewPosition(new Point(0, 0));
 	}
 
-	private void clearItemList()
-	{
+	private void clearItemList() {
 		listingsPanel.removeAll();
 		listEntriesWithLcItemName.clear();
 	}
 
-	void updateTimeDisplay(String timeString)
-	{
+	void updateTimeDisplay(String timeString) {
 		checkState(SwingUtilities.isEventDispatchThread());
 		syncTimeLabel.setText("Data from: " + timeString);
 	}
 
-	void displayItemListings(List<String> names, List<AsyncBufferedImage> icons)
-	{
+	void displayItemListings(List<String> names, List<AsyncBufferedImage> icons) {
 		checkState(SwingUtilities.isEventDispatchThread());
 		checkArgument(names.size() == icons.size());
 
@@ -119,8 +108,7 @@ class BankMemoryPanel extends PluginPanel
 		Point scrollPosition = itemsScrollPane.getViewport().getViewPosition();
 		clearItemList();
 
-		for (int i = 0; i < names.size(); i++)
-		{
+		for (int i = 0; i < names.size(); i++) {
 			JLabel label = new JLabel(names.get(i));
 			icons.get(i).addTo(label);
 			listEntriesWithLcItemName.add(new ListingEntry(names.get(i).toLowerCase(), label));
@@ -132,10 +120,8 @@ class BankMemoryPanel extends PluginPanel
 		repaint();
 	}
 
-	private void ensureDisplayIsInItemListState()
-	{
-		if (state == DisplayState.SHOWING_ITEM_LIST)
-		{
+	private void ensureDisplayIsInItemListState() {
+		if (state == DisplayState.SHOWING_ITEM_LIST) {
 			return;
 		}
 		removeAll();
@@ -145,26 +131,22 @@ class BankMemoryPanel extends PluginPanel
 		state = DisplayState.SHOWING_ITEM_LIST;
 	}
 
-	private void updateFiltering()
-	{
+	private void updateFiltering() {
 		assert SwingUtilities.isEventDispatchThread();
 
 		String lowerCaseFilter = filterField.getText().toLowerCase();
-		for (ListingEntry entry : listEntriesWithLcItemName)
-		{
+		for (ListingEntry entry : listEntriesWithLcItemName) {
 			boolean visible = lowerCaseFilter.isEmpty() || entry.getLcName().contains(lowerCaseFilter);
 			entry.getListComponent().setVisible(visible);
 		}
 	}
 
 	@Value
-	private static class ListingEntry
-	{
+	private static class ListingEntry {
 		private final String lcName;
 		private final JComponent listComponent;
 
-		ListingEntry(String lcName, JComponent listComponent)
-		{
+		ListingEntry(String lcName, JComponent listComponent) {
 			assert lcName.toLowerCase().equals(lcName);
 			this.lcName = lcName;
 			this.listComponent = listComponent;

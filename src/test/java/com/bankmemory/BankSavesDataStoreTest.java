@@ -2,8 +2,7 @@ package com.bankmemory;
 
 import org.junit.Test;
 
-public class BankSavesDataStoreTest
-{
+public class BankSavesDataStoreTest {
 	// loadSavedBanks
 	// given no data is present (returns the special instance)
 	// given data present

@@ -5,20 +5,17 @@ import javax.swing.event.DocumentListener;
 
 public abstract class OnAnyChangeDocumentListener implements DocumentListener {
     @Override
-    public void insertUpdate(DocumentEvent e)
-    {
+    public void insertUpdate(DocumentEvent e) {
         onChange(e);
     }
 
     @Override
-    public void removeUpdate(DocumentEvent e)
-    {
+    public void removeUpdate(DocumentEvent e) {
         onChange(e);
     }
 
     @Override
-    public void changedUpdate(DocumentEvent e)
-    {
+    public void changedUpdate(DocumentEvent e) {
         onChange(e);
     }
 
