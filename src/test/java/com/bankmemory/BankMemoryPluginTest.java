@@ -113,8 +113,8 @@ public class BankMemoryPluginTest
 	// bank returns data, data is new, sets time and data
 	// bank returns data, data is same as last displayed, only updates time
 
-	private static void waitForEdtQueueToEmpty() {
-		SwingUtilities.invokeLater(() -> { /* Do nothing */ });
+	private static void waitForEdtQueueToEmpty() throws Exception {
+		SwingUtilities.invokeAndWait(() -> { /* Do nothing */ });
 	}
 
 	private static class TestBankMemoryPlugin extends BankMemoryPlugin
