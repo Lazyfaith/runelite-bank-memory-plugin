@@ -1,6 +1,5 @@
 package com.bankmemory;
 
-import com.google.common.collect.ImmutableList;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
@@ -20,8 +19,6 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +29,6 @@ import java.util.List;
 )
 public class BankMemoryPlugin extends Plugin {
     private static final String ICON = "bank_memory_icon.png";
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss, d MMM");
 
     @Inject
     private ClientToolbar clientToolbar;
@@ -114,25 +110,7 @@ public class BankMemoryPlugin extends Plugin {
             return;
         }
 
-        handleBankSave(createSaveFromBank(bank));
-    }
-
-    private BankSave createSaveFromBank(ItemContainer bank) {
-        net.runelite.api.Item[] contents = bank.getItems();
-        ImmutableList.Builder<BankSave.Item> bankData = ImmutableList.builder();
-
-        for (net.runelite.api.Item item : contents) {
-            int idInBank = item.getId();
-            int canonId = itemManager.canonicalize(idInBank);
-            if (idInBank != canonId) {
-                // It's just a placeholder
-                continue;
-            }
-
-            bankData.add(new BankSave.Item(canonId, item.getQuantity()));
-        }
-        String timeString = FORMATTER.format(ZonedDateTime.now());
-        return new BankSave(client.getUsername(), timeString, bankData.build());
+        handleBankSave(BankSave.fromBank(bank, client, itemManager));
     }
 
     private void handleBankSave(BankSave newSave) {
