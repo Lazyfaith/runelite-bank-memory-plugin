@@ -5,13 +5,13 @@ import lombok.Value;
 
 @Value
 class BankSave {
-	private final String userName;
-	private final String timeString;
-	private final ImmutableList<Item> bankData;
+    private final String userName;
+    private final String timeString;
+    private final ImmutableList<Item> bankData;
 
-	@Value
-	static class Item {
-		private final int itemId;
-		private final int quantity;
-	}
+    @Value
+    static class Item {
+        private final int itemId;
+        private final int quantity;
+    }
 }
