@@ -36,7 +36,7 @@ public class BankMemoryPluginTest {
     @Bind
     private BankSavesDataStore dataStore;
     @Mock
-    private BankMemoryPanel pluginPanel;
+    private BankMemoryPluginPanel pluginPanel;
     @Mock
     private Injector pluginInjector;
 
@@ -50,7 +50,7 @@ public class BankMemoryPluginTest {
     public void before() {
         Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
         bankMemoryPlugin.setInjector(pluginInjector);
-        when(pluginInjector.getInstance(BankMemoryPanel.class)).thenReturn(pluginPanel);
+        when(pluginInjector.getInstance(BankMemoryPluginPanel.class)).thenReturn(pluginPanel);
     }
 
     // startup

@@ -17,7 +17,7 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
-class BankMemoryPanel extends PluginPanel {
+class BankMemoryPluginPanel extends PluginPanel {
 
     private enum DisplayState {
         RESET, SHOWING_NO_DATA, SHOWING_ITEM_LIST
@@ -35,7 +35,7 @@ class BankMemoryPanel extends PluginPanel {
 
     private final List<ListingEntry> listEntriesWithLcItemName = new ArrayList<>();
 
-    protected BankMemoryPanel() {
+    protected BankMemoryPluginPanel() {
         super(false);
         setLayout(new BorderLayout(0, PAD));
         setBorder(BorderFactory.createEmptyBorder(PAD, PAD, PAD, PAD));

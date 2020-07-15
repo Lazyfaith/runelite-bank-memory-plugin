@@ -39,7 +39,7 @@ public class BankMemoryPlugin extends Plugin {
     @Inject
     private BankSavesDataStore dataStore;
 
-    private BankMemoryPanel panel;
+    private BankMemoryPluginPanel panel;
     private NavigationButton navButton;
 
     // Saves stored in chronological order, with most recent saves at the end
@@ -51,7 +51,7 @@ public class BankMemoryPlugin extends Plugin {
     @Override
     protected void startUp() throws Exception {
         existingSavesByUserName = dataStore.loadSavedBanks();
-        panel = injector.getInstance(BankMemoryPanel.class);
+        panel = injector.getInstance(BankMemoryPluginPanel.class);
 
         BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), ICON);
         navButton = NavigationButton.builder()
