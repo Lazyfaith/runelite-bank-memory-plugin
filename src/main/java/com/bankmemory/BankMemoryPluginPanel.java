@@ -7,14 +7,12 @@ import java.awt.Point;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.JList;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
-import lombok.Value;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.PluginPanel;
 import net.runelite.client.ui.components.IconTextField;
@@ -23,6 +21,7 @@ import net.runelite.client.util.AsyncBufferedImage;
 
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 class BankMemoryPluginPanel extends PluginPanel {
@@ -37,11 +36,9 @@ class BankMemoryPluginPanel extends PluginPanel {
 
     private final JLabel syncTimeLabel;
     private final IconTextField filterField;
-    private final JPanel listingsPanel;
+    private final ItemList itemsList;
     private final JScrollPane itemsScrollPane;
     private final PluginErrorPanel errorPanel;
-
-    private final List<ListingEntry> listEntriesWithLcItemName = new ArrayList<>();
 
     protected BankMemoryPluginPanel() {
         super(false);
@@ -50,9 +47,9 @@ class BankMemoryPluginPanel extends PluginPanel {
 
         filterField = new IconTextField();
 
-        listingsPanel = new JPanel();
-        listingsPanel.setLayout(new BoxLayout(listingsPanel, BoxLayout.Y_AXIS));
-        itemsScrollPane = new JScrollPane(listingsPanel);
+        itemsList = new ItemList();
+        itemsList.setCellRenderer(new ItemListRenderer());
+        itemsScrollPane = new JScrollPane(itemsList);
 
         filterField.setIcon(IconTextField.Icon.SEARCH);
         filterField.setPreferredSize(new Dimension(PluginPanel.PANEL_WIDTH - 20, 30));
@@ -62,7 +59,7 @@ class BankMemoryPluginPanel extends PluginPanel {
             @Override
             public void onChange(DocumentEvent e) {
                 itemsScrollPane.getViewport().setViewPosition(new Point(0, 0));
-                updateFiltering();
+                itemsList.getModel().applyFilter(filterField.getText());
             }
         });
 
@@ -88,7 +85,8 @@ class BankMemoryPluginPanel extends PluginPanel {
      */
     void reset() {
         checkState(SwingUtilities.isEventDispatchThread());
-        clearItemList();
+        itemsList.getModel().clearList();
+        itemsList.getModel().clearFilter();
         resetScrolling();
         removeAll();
         state = DisplayState.RESET;
@@ -96,11 +94,6 @@ class BankMemoryPluginPanel extends PluginPanel {
 
     private void resetScrolling() {
         itemsScrollPane.getViewport().setViewPosition(new Point(0, 0));
-    }
-
-    private void clearItemList() {
-        listingsPanel.removeAll();
-        listEntriesWithLcItemName.clear();
     }
 
     void updateTimeDisplay(String timeString) {
@@ -114,16 +107,17 @@ class BankMemoryPluginPanel extends PluginPanel {
 
         ensureDisplayIsInItemListState();
         Point scrollPosition = itemsScrollPane.getViewport().getViewPosition();
-        clearItemList();
 
+        List<ItemListEntry> itemData = new ArrayList<>();
         for (int i = 0; i < names.size(); i++) {
-            JLabel label = new JLabel(names.get(i));
-            icons.get(i).addTo(label);
-            listEntriesWithLcItemName.add(new ListingEntry(names.get(i).toLowerCase(), label));
-            listingsPanel.add(label);
+            AsyncBufferedImage img = icons.get(i);
+            int unfilteredRow = i;
+            img.onLoaded(() -> repaintItemEntryIfRowVisible(unfilteredRow));
+            itemData.add(new ItemListEntry(names.get(i), img));
         }
+        FilterableItemListModel listModel = itemsList.getModel();
+        listModel.setListContents(itemData);
 
-        updateFiltering();
         itemsScrollPane.getViewport().setViewPosition(scrollPosition);
         repaint();
     }
@@ -139,25 +133,32 @@ class BankMemoryPluginPanel extends PluginPanel {
         state = DisplayState.SHOWING_ITEM_LIST;
     }
 
-    private void updateFiltering() {
-        assert SwingUtilities.isEventDispatchThread();
-
-        String lowerCaseFilter = filterField.getText().toLowerCase();
-        for (ListingEntry entry : listEntriesWithLcItemName) {
-            boolean visible = lowerCaseFilter.isEmpty() || entry.getLcName().contains(lowerCaseFilter);
-            entry.getListComponent().setVisible(visible);
+    private void repaintItemEntryIfRowVisible(int unfilteredIndex) {
+        int adjustedIndex = itemsList.getModel().getAdjustedIndex(unfilteredIndex);
+        if (adjustedIndex < 0) {
+            // Filtered out!
+            return;
+        }
+        if (itemsList.getFirstVisibleIndex() <= unfilteredIndex && unfilteredIndex <= itemsList.getLastVisibleIndex()) {
+            itemsList.repaint(itemsList.getCellBounds(adjustedIndex, adjustedIndex));
         }
     }
 
-    @Value
-    private static class ListingEntry {
-        private final String lcName;
-        private final JComponent listComponent;
+    private static class ItemList extends JList<ItemListEntry> {
+        ItemList() {
+            super(new FilterableItemListModel());
+        }
 
-        ListingEntry(String lcName, JComponent listComponent) {
-            assert lcName.toLowerCase().equals(lcName);
-            this.lcName = lcName;
-            this.listComponent = listComponent;
+        @Override
+        public void setModel(ListModel<ItemListEntry> model) {
+            checkNotNull(model);
+            checkArgument(model instanceof FilterableItemListModel, "Incorrect class: " + model.getClass());
+            super.setModel(model);
+        }
+
+        @Override
+        public FilterableItemListModel getModel() {
+            return (FilterableItemListModel) super.getModel();
         }
     }
 }
