@@ -1,5 +1,12 @@
 package com.bankmemory;
 
+import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
@@ -14,14 +21,6 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.AsyncBufferedImage;
 import net.runelite.client.util.ImageUtil;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.swing.*;
-import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 @PluginDescriptor(
         name = "Bank Memory",

@@ -2,7 +2,6 @@ package com.bankmemory;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-
 import java.util.ArrayList;
 import java.util.List;
 

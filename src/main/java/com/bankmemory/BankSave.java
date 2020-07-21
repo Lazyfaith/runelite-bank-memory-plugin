@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableList;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import net.runelite.api.Client;
 import net.runelite.api.ItemContainer;
