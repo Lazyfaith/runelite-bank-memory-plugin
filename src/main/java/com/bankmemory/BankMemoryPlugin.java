@@ -13,6 +13,7 @@ import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.ScriptCallbackEvent;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
@@ -34,6 +35,8 @@ public class BankMemoryPlugin extends Plugin {
     @Inject
     private Client client;
     @Inject
+    private ClientThread clientThread;
+    @Inject
     private ItemManager itemManager;
     @Inject
     private BankSavesDataStore dataStore;
@@ -49,6 +52,7 @@ public class BankMemoryPlugin extends Plugin {
 
     @Override
     protected void startUp() throws Exception {
+        assert SwingUtilities.isEventDispatchThread();
         existingSavesByUserName = dataStore.loadSavedBanks();
         panel = injector.getInstance(BankMemoryPluginPanel.class);
 
@@ -63,7 +67,7 @@ public class BankMemoryPlugin extends Plugin {
         clientToolbar.addNavigation(navButton);
 
         if (client.getGameState() == GameState.LOGGED_IN) {
-            updateDisplayForCurrentAccount();
+            clientThread.invokeLater(this::updateDisplayForCurrentAccount);
         } else {
             panel.displayNoDataMessage();
         }
