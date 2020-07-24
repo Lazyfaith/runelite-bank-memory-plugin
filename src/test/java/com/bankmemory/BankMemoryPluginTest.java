@@ -6,21 +6,21 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.testing.fieldbinder.Bind;
 import com.google.inject.testing.fieldbinder.BoundFieldModule;
-import java.util.LinkedHashMap;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ClientToolbar;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -33,10 +33,12 @@ public class BankMemoryPluginTest {
     private Client client;
     @Mock
     @Bind
-    private ItemManager itemManager;
+    private ClientThread clientThread;
     @Mock
     @Bind
-    private BankSavesDataStore dataStore;
+    private ItemManager itemManager;
+    @Mock
+    private CurrentBankPanelController currentBankPanelController;
     @Mock
     private BankMemoryPluginPanel pluginPanel;
     @Mock
@@ -45,78 +47,43 @@ public class BankMemoryPluginTest {
     @Inject
     private TestBankMemoryPlugin bankMemoryPlugin;
 
-    private final ImmutableList<BankSave.Item> itemSetA = ImmutableList.of(new BankSave.Item(1, 1));
-    private final ImmutableList<BankSave.Item> itemSetB = ImmutableList.of(new BankSave.Item(2, 2), new BankSave.Item(3, 3));
-
     @Before
     public void before() {
         Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
         bankMemoryPlugin.setInjector(pluginInjector);
         when(pluginInjector.getInstance(BankMemoryPluginPanel.class)).thenReturn(pluginPanel);
-    }
-
-    // startup
-    // if logged in, loads save if available
-    // if logged in, displays no data if none available
-    // if not logged in, displays no data
-    @Test
-    public void testStartup_ifNotLoggedIn_displaysNoData() throws Exception {
-        when(client.getGameState()).thenReturn(GameState.LOGIN_SCREEN);
-
-        bankMemoryPlugin.startUp();
-
-        waitForEdtQueueToEmpty();
-        verify(pluginPanel).displayNoDataMessage();
-        verifyNoMoreInteractions(pluginPanel);
+        when(pluginInjector.getInstance(CurrentBankPanelController.class)).thenReturn(currentBankPanelController);
     }
 
     @Test
-    public void testStartup_ifLoggedIn_ifDataAvailable_displaysData() throws Exception {
-        when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
-        when(client.getUsername()).thenReturn("LazyFaith");
-        LinkedHashMap<String, BankSave> existingSave = new LinkedHashMap<>();
-        existingSave.put("LazyFaith", new BankSave("LazyFaith", "Tuesday", itemSetA));
-        when(dataStore.loadSavedBanks()).thenReturn(existingSave);
+    public void testStartup_startsCurrentBankControllerOnClientThread() throws Exception {
+        ArgumentCaptor<Runnable> ac = ArgumentCaptor.forClass(Runnable.class);
 
-        bankMemoryPlugin.startUp();
+        SwingUtilities.invokeAndWait(noCatch(bankMemoryPlugin::startUp));
 
-        waitForEdtQueueToEmpty();
-        verify(pluginPanel).updateTimeDisplay("");
-        verify(pluginPanel).displayItemListings(null, null);
+        verify(clientThread).invokeLater(ac.capture());
+        verify(currentBankPanelController, never()).startUp();
+        ac.getValue().run();
+        verify(currentBankPanelController).startUp();
     }
 
-    @Test
-    public void testStartup_ifLoggedIn_ifNoDataAvailable_displaysNoData() throws Exception {
-        when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
-        when(client.getUsername()).thenReturn("LazyFaith");
-        when(dataStore.loadSavedBanks()).thenReturn(new LinkedHashMap<>());
-
-        bankMemoryPlugin.startUp();
-
-        waitForEdtQueueToEmpty();
-        verify(pluginPanel).displayNoDataMessage();
-        verifyNoMoreInteractions(pluginPanel);
-    }
-
-    // shutdown
-    // resets panel
-    @Test
-    public void testShutdown_resetsPanel() {
-
-    }
-
-    // onScriptCallbackEvent
-    // bank returns null, does nothing
-    // bank returns data, data is new, sets time and data
-    // bank returns data, data is same as last displayed, only updates time
-
-    private static void waitForEdtQueueToEmpty() throws Exception {
-        SwingUtilities.invokeAndWait(() -> { /* Do nothing */ });
+    private static Runnable noCatch(ThrowingRunnable throwingRunnable) {
+        return () -> {
+            try {
+                throwingRunnable.run();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
     }
 
     private static class TestBankMemoryPlugin extends BankMemoryPlugin {
         void setInjector(Injector injector) {
             this.injector = injector;
         }
+    }
+
+    private interface ThrowingRunnable {
+        void run() throws Exception;
     }
 }
