@@ -76,7 +76,6 @@ public class BankViewPanel extends JPanel {
         reset();
         add(errorPanel, BorderLayout.NORTH);
         state = DisplayState.SHOWING_NO_DATA;
-        repaint();
     }
 
     /**
@@ -119,7 +118,7 @@ public class BankViewPanel extends JPanel {
         listModel.setListContents(itemData);
 
         itemsScrollPane.getViewport().setViewPosition(scrollPosition);
-        repaint();
+        validate();
     }
 
     private void ensureDisplayIsInItemListState() {
