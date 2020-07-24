@@ -19,8 +19,8 @@ public class CurrentBankPanelController {
     private ItemManager itemManager;
     @Inject
     private BankSavesDataStore dataStore;
-    @Inject
-    private BankMemoryPluginPanel panel;
+
+    private BankViewPanel panel;
 
     // Saves stored in chronological order, with most recent saves at the end
     private LinkedHashMap<String, BankSave> existingSavesByUserName;
@@ -28,9 +28,10 @@ public class CurrentBankPanelController {
     @Nullable
     private BankSave latestDisplayedData = null;
 
-    public void startUp() {
+    public void startUp(BankViewPanel panel) {
         assert client.isClientThread();
 
+        this.panel = panel;
         existingSavesByUserName = dataStore.loadSavedBanks();
 
         if (client.getGameState() == GameState.LOGGED_IN) {

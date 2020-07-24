@@ -39,8 +39,7 @@ public class CurrentBankPanelControllerTest {
     @Bind
     private BankSavesDataStore dataStore;
     @Mock
-    @Bind
-    private BankMemoryPluginPanel panel;
+    private BankViewPanel panel;
 
     @Inject
     private CurrentBankPanelController currentBankPanelController;
@@ -59,7 +58,7 @@ public class CurrentBankPanelControllerTest {
     public void testStartup_ifNotLoggedIn_displayNoData() throws Exception {
         when(client.getGameState()).thenReturn(GameState.LOGIN_SCREEN);
 
-        currentBankPanelController.startUp();
+        currentBankPanelController.startUp(panel);
 
         waitForEdtQueueToEmpty();
         verify(panel).displayNoDataMessage();
@@ -74,7 +73,7 @@ public class CurrentBankPanelControllerTest {
                 ImmutableList.of(new BankSave.Item(1, 1))));
         when(dataStore.loadSavedBanks()).thenReturn(saveData);
 
-        currentBankPanelController.startUp();
+        currentBankPanelController.startUp(panel);
 
         waitForEdtQueueToEmpty();
         verify(panel).displayNoDataMessage();
@@ -91,7 +90,7 @@ public class CurrentBankPanelControllerTest {
                 ImmutableList.of(new BankSave.Item(0, 1))));
         when(dataStore.loadSavedBanks()).thenReturn(saveData);
 
-        currentBankPanelController.startUp();
+        currentBankPanelController.startUp(panel);
 
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Tuesday");
@@ -106,7 +105,7 @@ public class CurrentBankPanelControllerTest {
         BankSave mondaySave = new BankSave("MrSam", "Monday",
                 ImmutableList.of(new BankSave.Item(0, 100), new BankSave.Item(2, 666)));
         BankSave tuesdaySave = new BankSave(mondaySave.getUserName(), "Tuesday", mondaySave.getBankData());
-        currentBankPanelController.startUp();
+        currentBankPanelController.startUp(panel);
 
         verify(panel, never()).updateTimeDisplay(any());
         verify(panel, never()).displayItemListings(any(), any());

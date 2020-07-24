@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -62,9 +63,9 @@ public class BankMemoryPluginTest {
         SwingUtilities.invokeAndWait(noCatch(bankMemoryPlugin::startUp));
 
         verify(clientThread).invokeLater(ac.capture());
-        verify(currentBankPanelController, never()).startUp();
+        verify(currentBankPanelController, never()).startUp(any());
         ac.getValue().run();
-        verify(currentBankPanelController).startUp();
+        verify(currentBankPanelController).startUp(pluginPanel.getCurrentBankViewPanel());
     }
 
     private static Runnable noCatch(ThrowingRunnable throwingRunnable) {

@@ -42,20 +42,21 @@ public class BankMemoryPlugin extends Plugin {
         assert SwingUtilities.isEventDispatchThread();
 
         // Doing it here ensures it's created on the EDT
-        BankMemoryPluginPanel panel = injector.getInstance(BankMemoryPluginPanel.class);
+        BankMemoryPluginPanel pluginPanel = injector.getInstance(BankMemoryPluginPanel.class);
 
         BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), ICON);
         navButton = NavigationButton.builder()
                 .tooltip("Bank Memory")
                 .icon(icon)
                 .priority(7)
-                .panel(panel)
+                .panel(pluginPanel)
                 .build();
 
         clientToolbar.addNavigation(navButton);
 
         currentBankPanelController = injector.getInstance(CurrentBankPanelController.class);
-        clientThread.invokeLater(currentBankPanelController::startUp);
+        BankViewPanel currentBankView = pluginPanel.getCurrentBankViewPanel();
+        clientThread.invokeLater(() -> currentBankPanelController.startUp(currentBankView));
     }
 
     @Override
