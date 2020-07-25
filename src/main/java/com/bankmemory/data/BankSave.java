@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.data;
 
 import com.google.common.collect.ImmutableList;
 import java.time.ZonedDateTime;
@@ -10,7 +10,7 @@ import net.runelite.api.ItemContainer;
 import net.runelite.client.game.ItemManager;
 
 @Value
-class BankSave {
+public class BankSave {
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss, d MMM");
 
     private final String userName;
@@ -18,7 +18,7 @@ class BankSave {
     private final ImmutableList<Item> bankData;
 
     @Value
-    static class Item {
+    public static class Item {
         private final int itemId;
         private final int quantity;
     }

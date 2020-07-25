@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.data;
 
 import org.junit.Test;
 

@@ -1,5 +1,7 @@
 package com.bankmemory;
 
+import com.bankmemory.data.BankSave;
+import com.bankmemory.data.BankSavesDataStore;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Inject;

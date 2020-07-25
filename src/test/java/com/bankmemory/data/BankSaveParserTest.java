@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.data;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;

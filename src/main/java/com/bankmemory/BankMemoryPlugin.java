@@ -1,5 +1,7 @@
 package com.bankmemory;
 
+import com.bankmemory.data.BankSave;
+import com.google.inject.Binder;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
