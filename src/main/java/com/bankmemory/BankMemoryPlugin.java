@@ -1,7 +1,6 @@
 package com.bankmemory;
 
 import com.bankmemory.data.BankSave;
-import com.google.inject.Binder;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
@@ -9,7 +8,7 @@ import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.events.GameStateChanged;
-import net.runelite.api.events.ScriptCallbackEvent;
+import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.game.ItemManager;
@@ -72,16 +71,11 @@ public class BankMemoryPlugin extends Plugin {
     }
 
     @Subscribe
-    public void onScriptCallbackEvent(ScriptCallbackEvent event) {
-        // Apparently the event to listen to for opening the bank/changing bank contents
-        if ("setBankTitle".equals(event.getEventName())) {
+    public void onItemContainerChanged(ItemContainerChanged event) {
+        if (event.getContainerId() != InventoryID.BANK.getId()) {
             return;
         }
-        ItemContainer bank = client.getItemContainer(InventoryID.BANK);
-        if (bank == null) {
-            return;
-        }
-
+        ItemContainer bank = event.getItemContainer();
         currentBankPanelController.handleBankSave(BankSave.fromBank(bank, client, itemManager));
     }
 }
