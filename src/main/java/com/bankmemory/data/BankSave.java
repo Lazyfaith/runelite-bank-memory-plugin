@@ -1,32 +1,38 @@
 package com.bankmemory.data;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.Value;
-import net.runelite.api.Client;
 import net.runelite.api.ItemContainer;
 import net.runelite.client.game.ItemManager;
 
 @Value
 public class BankSave {
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss, d MMM");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss, d MMM");
+    private static final long ID_BASE = System.currentTimeMillis();
+    private static final AtomicInteger idIncrementer = new AtomicInteger();
 
-    private final String userName;
-    private final String timeString;
-    private final ImmutableList<Item> bankData;
+    long id;
+    String dateTimeString;
+    String userName;
+    ImmutableList<BankItem> itemData;
 
-    @Value
-    public static class Item {
-        private final int itemId;
-        private final int quantity;
+    @VisibleForTesting
+    public BankSave(String userName, String dateTimeString, ImmutableList<BankItem> itemData) {
+        id = ID_BASE + idIncrementer.incrementAndGet();
+        this.userName = userName;
+        this.dateTimeString = dateTimeString;
+        this.itemData = itemData;
     }
 
-    public static BankSave fromBank(ItemContainer bank, Client client, ItemManager itemManager) {
+    public static BankSave fromBank(String userName, ItemContainer bank, ItemManager itemManager) {
         Objects.requireNonNull(bank);
         net.runelite.api.Item[] contents = bank.getItems();
-        ImmutableList.Builder<BankSave.Item> bankData = ImmutableList.builder();
+        ImmutableList.Builder<BankItem> itemData = ImmutableList.builder();
 
         for (net.runelite.api.Item item : contents) {
             int idInBank = item.getId();
@@ -36,9 +42,9 @@ public class BankSave {
                 continue;
             }
 
-            bankData.add(new BankSave.Item(canonId, item.getQuantity()));
+            itemData.add(new BankItem(canonId, item.getQuantity()));
         }
-        String timeString = FORMATTER.format(ZonedDateTime.now());
-        return new BankSave(client.getUsername(), timeString, bankData.build());
+        String timeString = DATE_FORMATTER.format(ZonedDateTime.now());
+        return new BankSave(userName, timeString, itemData.build());
     }
 }

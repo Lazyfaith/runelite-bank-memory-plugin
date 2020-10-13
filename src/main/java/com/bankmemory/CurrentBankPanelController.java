@@ -1,10 +1,11 @@
 package com.bankmemory;
 
+import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankSavesDataStore;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
@@ -24,9 +25,6 @@ public class CurrentBankPanelController {
 
     private BankViewPanel panel;
 
-    // Saves stored in chronological order, with most recent saves at the end
-    private LinkedHashMap<String, BankSave> existingSavesByUserName;
-
     @Nullable
     private BankSave latestDisplayedData = null;
 
@@ -34,7 +32,6 @@ public class CurrentBankPanelController {
         assert client.isClientThread();
 
         this.panel = panel;
-        existingSavesByUserName = dataStore.loadSavedBanks();
 
         if (client.getGameState() == GameState.LOGGED_IN) {
             updateDisplayForCurrentAccount();
@@ -53,13 +50,14 @@ public class CurrentBankPanelController {
     }
 
     private void updateDisplayForCurrentAccount() {
-        String currentUsername = client.getUsername();
-        BankSave existingSave = existingSavesByUserName.get(currentUsername);
-        if (existingSave != null) {
-            if (latestDisplayedData != null && !latestDisplayedData.getUserName().equals(currentUsername)) {
+        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(client.getUsername());
+        if (existingSave.isPresent()) {
+            BankSave save = existingSave.get();
+            if (latestDisplayedData != null
+                    && !latestDisplayedData.getUserName().equals(save.getUserName())) {
                 SwingUtilities.invokeLater(panel::reset);
             }
-            handleBankSave(existingSave);
+            handleBankSave(existingSave.get());
         } else {
             latestDisplayedData = null;
             SwingUtilities.invokeLater(panel::displayNoDataMessage);
@@ -69,9 +67,7 @@ public class CurrentBankPanelController {
     public void handleBankSave(BankSave newSave) {
         assert client.isClientThread();
 
-        existingSavesByUserName.remove(newSave.getUserName());
-        existingSavesByUserName.put(newSave.getUserName(), newSave);
-        dataStore.saveBanks(existingSavesByUserName);
+        dataStore.saveAsCurrentBank(newSave);
 
         boolean isDataNew = isItemDataNew(newSave);
         List<String> names = new ArrayList<>();
@@ -79,16 +75,16 @@ public class CurrentBankPanelController {
         if (isDataNew) {
             // Get all the data we need for the UI on this thread (the game thread)
             // Doing it on the EDT seems to cause random crashes & NPEs
-            for (BankSave.Item i : newSave.getBankData()) {
+            for (BankItem i : newSave.getItemData()) {
                 names.add(itemManager.getItemComposition(i.getItemId()).getName());
                 icons.add(itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1));
             }
         }
         SwingUtilities.invokeLater(() -> {
-            panel.updateTimeDisplay(newSave.getTimeString());
+            panel.updateTimeDisplay(newSave.getDateTimeString());
             if (isDataNew) {
-                assert names.size() == newSave.getBankData().size();
-                assert icons.size() == newSave.getBankData().size();
+                assert names.size() == newSave.getItemData().size();
+                assert icons.size() == newSave.getItemData().size();
                 panel.displayItemListings(names, icons);
             }
         });
@@ -96,6 +92,6 @@ public class CurrentBankPanelController {
     }
 
     private boolean isItemDataNew(BankSave newSave) {
-        return latestDisplayedData == null || !latestDisplayedData.getBankData().equals(newSave.getBankData());
+        return latestDisplayedData == null || !latestDisplayedData.getItemData().equals(newSave.getItemData());
     }
 }

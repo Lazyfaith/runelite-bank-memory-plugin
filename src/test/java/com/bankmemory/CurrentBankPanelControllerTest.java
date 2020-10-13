@@ -1,5 +1,6 @@
 package com.bankmemory;
 
+import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankSavesDataStore;
 import com.google.common.collect.ImmutableList;
@@ -9,6 +10,7 @@ import com.google.inject.testing.fieldbinder.Bind;
 import com.google.inject.testing.fieldbinder.BoundFieldModule;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Optional;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
@@ -70,10 +72,7 @@ public class CurrentBankPanelControllerTest {
     public void testStartup_ifLoggedInButNoDataForAccount_displayNoData() throws Exception {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getUsername()).thenReturn("MrSam");
-        LinkedHashMap<String, BankSave> saveData = new LinkedHashMap<>();
-        saveData.put("SomeOtherAccount", new BankSave("SomeOtherAccount", "Monday",
-                ImmutableList.of(new BankSave.Item(1, 1))));
-        when(dataStore.loadSavedBanks()).thenReturn(saveData);
+        when(dataStore.getDataForCurrentBank("MrSam")).thenReturn(Optional.empty());
 
         currentBankPanelController.startUp(panel);
 
@@ -85,12 +84,8 @@ public class CurrentBankPanelControllerTest {
     public void testStartup_ifLoggedInAndDataAvailable_displayAccountData() throws Exception {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getUsername()).thenReturn("MrSam");
-        LinkedHashMap<String, BankSave> saveData = new LinkedHashMap<>();
-        saveData.put("MrSam", new BankSave("MrSam", "Tuesday",
-                ImmutableList.of(new BankSave.Item(0, 100), new BankSave.Item(2, 666))));
-        saveData.put("SomeOtherAccount", new BankSave("SomeOtherAccount", "Monday",
-                ImmutableList.of(new BankSave.Item(0, 1))));
-        when(dataStore.loadSavedBanks()).thenReturn(saveData);
+        when(dataStore.getDataForCurrentBank("MrSam")).thenReturn(Optional.of(
+                new BankSave("MrSam", "Tuesday", ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)))));
 
         currentBankPanelController.startUp(panel);
 
@@ -103,10 +98,9 @@ public class CurrentBankPanelControllerTest {
     public void testHandleBankSave_ifItemDataHasNotChangedThenOnlyUpdateTime() throws Exception {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getUsername()).thenReturn("MrSam");
-        when(dataStore.loadSavedBanks()).thenReturn(new LinkedHashMap<>());
         BankSave mondaySave = new BankSave("MrSam", "Monday",
-                ImmutableList.of(new BankSave.Item(0, 100), new BankSave.Item(2, 666)));
-        BankSave tuesdaySave = new BankSave(mondaySave.getUserName(), "Tuesday", mondaySave.getBankData());
+                ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)));
+        BankSave tuesdaySave = new BankSave(mondaySave.getUserName(), "Tuesday", mondaySave.getItemData());
         currentBankPanelController.startUp(panel);
 
         verify(panel, never()).updateTimeDisplay(any());
