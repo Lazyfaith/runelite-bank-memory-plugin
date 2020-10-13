@@ -76,6 +76,7 @@ public class BankViewPanel extends JPanel {
         reset();
         add(errorPanel, BorderLayout.NORTH);
         state = DisplayState.SHOWING_NO_DATA;
+        repaint();
     }
 
     /**
