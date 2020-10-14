@@ -12,7 +12,7 @@ import net.runelite.client.game.ItemManager;
 
 @Value
 public class BankSave {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss, d MMM");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss, d MMM uuuu");
     private static final long ID_BASE = System.currentTimeMillis();
     private static final AtomicInteger idIncrementer = new AtomicInteger();
 
