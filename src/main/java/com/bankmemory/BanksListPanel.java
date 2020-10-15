@@ -8,12 +8,17 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.MouseInfo;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import net.runelite.client.ui.ColorScheme;
@@ -21,7 +26,10 @@ import net.runelite.client.ui.ColorScheme;
 
 public class BanksListPanel extends JPanel {
 
+    private static final String DELETE_SAVE = "Delete save...";
+
     private final JPanel listPanel;
+    private final JPopupMenu bankEntryContextMenu;
     private final ListEntryMouseListener mouseListener;
     private final BanksListInteractionListener interactionListener;
 
@@ -29,6 +37,7 @@ public class BanksListPanel extends JPanel {
         super();
         this.interactionListener = interactionListener;
         mouseListener = new ListEntryMouseListener();
+        bankEntryContextMenu = createContextMenu();
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(Constants.PAD, 0, Constants.PAD, 0));
@@ -38,6 +47,27 @@ public class BanksListPanel extends JPanel {
         listWrapper.add(listPanel, BorderLayout.NORTH);
         JScrollPane scrollPane = new JScrollPane(listWrapper);
         add(scrollPane, BorderLayout.CENTER);
+    }
+
+    private JPopupMenu createContextMenu() {
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(createMenuDeleteAction(menu));
+        return menu;
+    }
+
+    private Action createMenuDeleteAction(JPopupMenu menu) {
+        return new AbstractAction(DELETE_SAVE) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String message = "Are you sure you want to delete this save?";
+                int result = JOptionPane.showConfirmDialog(
+                        BanksListPanel.this, message, "Bank Memory", JOptionPane.YES_NO_OPTION);
+                if (result == JOptionPane.YES_OPTION) {
+                    BanksListEntry save = ((EntryPanel) menu.getInvoker()).entry;
+                    interactionListener.selectedToDelete(save);
+                }
+            }
+        };
     }
 
     public void updateCurrentBanksList(List<BanksListEntry> entries) {
@@ -69,6 +99,7 @@ public class BanksListPanel extends JPanel {
             setBackground(ColorScheme.DARKER_GRAY_COLOR);
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             setToolTipText(entry.getDateTime());
+            setComponentPopupMenu(bankEntryContextMenu);
 
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;

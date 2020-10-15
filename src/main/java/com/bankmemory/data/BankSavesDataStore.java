@@ -171,6 +171,34 @@ public class BankSavesDataStore {
         }
     }
 
+    public void deleteBankSaveWithId(long saveId) {
+        List<StoredBanksUpdateListener> listenersCopy;
+        boolean changed = false;
+        synchronized (dataLock) {
+            listenersCopy = new ArrayList<>(listeners);
+            changed = deleteBankSaveWithIdImpl(saveId);
+        }
+        if (changed) {
+            listenersCopy.forEach(StoredBanksUpdateListener::currentBanksListChanged);
+        }
+    }
+
+    private boolean deleteBankSaveWithIdImpl(long id) {
+        Optional<BankSave> save = currentBankList.stream()
+                .filter(s -> s.getId() == id)
+                .findFirst();
+        if (save.isPresent()) {
+            currentBankList.remove(save.get());
+            ConfigWrite configWrite = new ConfigWrite(
+                    PLUGIN_BASE_GROUP, CURRENT_LIST_KEY, new ArrayList<>(currentBankList));
+            scheduleConfigWrite(configWrite);
+            return true;
+        } else {
+            log.error("Tried deleting missing bank save: {}", id);
+            return false;
+        }
+    }
+
     @AllArgsConstructor
     private static class ConfigWrite {
         final String configGroup;

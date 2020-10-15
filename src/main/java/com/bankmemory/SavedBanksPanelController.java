@@ -151,6 +151,11 @@ public class SavedBanksPanelController {
             workingToOpenBank.set(true);
             clientThread.invokeLater(() -> openSavedBank(save));
         }
+
+        @Override
+        public void selectedToDelete(BanksListEntry save) {
+            dataStore.deleteBankSaveWithId(save.getSaveId());
+        }
     }
 
     private class BanksUpdateListener implements StoredBanksUpdateListener {
