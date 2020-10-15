@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParseException;
 import com.google.gson.reflect.TypeToken;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
 
 @Slf4j
+@Singleton
 public class BankSavesDataStore {
     private static final String PLUGIN_BASE_GROUP = "bankMemory";
     private static final String CURRENT_LIST_KEY = "currentList";
@@ -27,6 +29,7 @@ public class BankSavesDataStore {
     private final ItemDataParser itemDataParser;
     private final List<BankSave> currentBankList;
     private final BlockingQueue<ConfigWrite> configWritesQueue = new LinkedBlockingQueue<>();
+    private final List<StoredBanksUpdateListener> listeners = new ArrayList<>();
 
     @Inject
     private BankSavesDataStore(ConfigManager configManager, ItemDataParser itemDataParser) {
@@ -64,6 +67,12 @@ public class BankSavesDataStore {
                 .create();
     }
 
+    public void addListener(StoredBanksUpdateListener listener) {
+        synchronized (dataLock) {
+            listeners.add(listener);
+        }
+    }
+
     public Optional<BankSave> getDataForCurrentBank(String login) {
         if (Strings.isNullOrEmpty(login)) {
             return Optional.empty();
@@ -75,10 +84,27 @@ public class BankSavesDataStore {
         }
     }
 
-    public void saveAsCurrentBank(BankSave newSave) {
+    public List<BankSave> getCurrentBanksList() {
         synchronized (dataLock) {
+            return new ArrayList<>(currentBankList);
+        }
+    }
+
+    public Optional<BankSave> getBankSaveWithId(long id) {
+        synchronized (dataLock) {
+            return currentBankList.stream()
+                    .filter(s -> s.getId() == id)
+                    .findFirst();
+        }
+    }
+
+    public void saveAsCurrentBank(BankSave newSave) {
+        List<StoredBanksUpdateListener> listenersCopy;
+        synchronized (dataLock) {
+            listenersCopy = new ArrayList<>(listeners);
             saveAsCurrentBankImpl(newSave);
         }
+        listenersCopy.forEach(StoredBanksUpdateListener::currentBanksListChanged);
     }
 
     private void saveAsCurrentBankImpl(BankSave newSave) {

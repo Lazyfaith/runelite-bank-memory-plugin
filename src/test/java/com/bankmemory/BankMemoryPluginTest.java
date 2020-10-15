@@ -41,6 +41,8 @@ public class BankMemoryPluginTest {
     @Mock
     private CurrentBankPanelController currentBankPanelController;
     @Mock
+    private SavedBanksPanelController savedBanksPanelController;
+    @Mock
     private BankMemoryPluginPanel pluginPanel;
     @Mock
     private Injector pluginInjector;
@@ -54,6 +56,7 @@ public class BankMemoryPluginTest {
         bankMemoryPlugin.setInjector(pluginInjector);
         when(pluginInjector.getInstance(BankMemoryPluginPanel.class)).thenReturn(pluginPanel);
         when(pluginInjector.getInstance(CurrentBankPanelController.class)).thenReturn(currentBankPanelController);
+        when(pluginInjector.getInstance(SavedBanksPanelController.class)).thenReturn(savedBanksPanelController);
     }
 
     @Test

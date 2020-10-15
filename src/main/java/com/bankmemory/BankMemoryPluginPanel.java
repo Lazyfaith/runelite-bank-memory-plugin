@@ -15,7 +15,7 @@ import static com.bankmemory.util.Constants.PAD;
 class BankMemoryPluginPanel extends PluginPanel {
 
     private final BankViewPanel currentBankViewPanel = new BankViewPanel();
-    private final JPanel savesListPanel = new JPanel();
+    private final JPanel savedBanksTopPanel = new JPanel();
 
     private final JPanel displayPanel = new JPanel();
     private final MaterialTabGroup tabGroup = new MaterialTabGroup(displayPanel);
@@ -27,7 +27,7 @@ class BankMemoryPluginPanel extends PluginPanel {
         setBorder(BorderFactory.createEmptyBorder(PAD, PAD, PAD, PAD));
 
         currentBankTab = new MaterialTab("Current bank", tabGroup, currentBankViewPanel);
-        savesListTab = new MaterialTab("Saved banks", tabGroup, savesListPanel);
+        savesListTab = new MaterialTab("Saved banks", tabGroup, savedBanksTopPanel);
         tabGroup.addTab(currentBankTab);
         tabGroup.addTab(savesListTab);
         tabGroup.select(currentBankTab);
@@ -39,5 +39,9 @@ class BankMemoryPluginPanel extends PluginPanel {
 
     BankViewPanel getCurrentBankViewPanel() {
         return currentBankViewPanel;
+    }
+
+    JPanel getSavedBanksTopPanel() {
+        return savedBanksTopPanel;
     }
 }
