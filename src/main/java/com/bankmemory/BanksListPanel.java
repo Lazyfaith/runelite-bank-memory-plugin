@@ -61,7 +61,7 @@ public class BanksListPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String message = "Are you sure you want to delete this save?";
                 int result = JOptionPane.showConfirmDialog(
-                        BanksListPanel.this, message, "Bank Memory", JOptionPane.YES_NO_OPTION);
+                        BanksListPanel.this, message, Constants.BANK_MEMORY, JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     BanksListEntry save = ((EntryPanel) menu.getInvoker()).entry;
                     interactionListener.selectedToDelete(save);

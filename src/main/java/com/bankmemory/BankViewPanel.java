@@ -1,5 +1,6 @@
 package com.bankmemory;
 
+import com.bankmemory.util.Constants;
 import com.bankmemory.util.OnAnyChangeDocumentListener;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -66,7 +67,7 @@ public class BankViewPanel extends JPanel {
         syncTimeLabel = new JLabel();
 
         errorPanel = new PluginErrorPanel();
-        errorPanel.setContent("Bank Memory",
+        errorPanel.setContent(Constants.BANK_MEMORY,
                 "Log in to a character and open a bank window to populate bank data for that character.");
         displayNoDataMessage();
     }

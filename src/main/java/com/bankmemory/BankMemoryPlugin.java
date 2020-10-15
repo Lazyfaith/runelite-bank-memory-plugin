@@ -2,6 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankSavesDataStore;
+import com.bankmemory.util.Constants;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
@@ -23,7 +24,7 @@ import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
 @PluginDescriptor(
-        name = "Bank Memory",
+        name = Constants.BANK_MEMORY,
         description = "A searchable record of what's in your bank"
 )
 public class BankMemoryPlugin extends Plugin {
@@ -54,7 +55,7 @@ public class BankMemoryPlugin extends Plugin {
 
         BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), ICON);
         navButton = NavigationButton.builder()
-                .tooltip("Bank Memory")
+                .tooltip(Constants.BANK_MEMORY)
                 .icon(icon)
                 .priority(7)
                 .panel(pluginPanel)
