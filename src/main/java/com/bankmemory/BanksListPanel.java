@@ -54,6 +54,8 @@ public class BanksListPanel extends JPanel {
             listPanel.add(entriesGapPad, c);
             c.gridy++;
         }
+        revalidate();
+        repaint();
     }
 
     private class EntryPanel extends JPanel {

@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import javax.swing.BoxLayout;
@@ -91,8 +92,10 @@ public class SavedBanksPanelController {
     // Gets called on EDT and on game client thread
     private void updateCurrentBanksList() {
         List<BanksListEntry> saves = new ArrayList<>();
+        TreeMap<String, String> displayNameMap = dataStore.getCurrentDisplayNameMap();
         for (BankSave save : dataStore.getCurrentBanksList()) {
-            saves.add(new BanksListEntry(save.getId(), casketIcon, save.getUserName(), save.getDateTimeString()));
+            String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
+            saves.add(new BanksListEntry(save.getId(), casketIcon, displayName, save.getDateTimeString()));
         }
         Runnable updateList = () -> banksListPanel.updateCurrentBanksList(saves);
         if (SwingUtilities.isEventDispatchThread()) {
@@ -153,6 +156,11 @@ public class SavedBanksPanelController {
     private class BanksUpdateListener implements StoredBanksUpdateListener {
         @Override
         public void currentBanksListChanged() {
+            updateCurrentBanksList();
+        }
+
+        @Override
+        public void displayNameMapUpdated() {
             updateCurrentBanksList();
         }
     }

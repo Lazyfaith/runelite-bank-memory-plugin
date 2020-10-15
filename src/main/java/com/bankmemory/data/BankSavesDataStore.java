@@ -10,8 +10,12 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import lombok.AllArgsConstructor;
@@ -23,10 +27,12 @@ import net.runelite.client.config.ConfigManager;
 public class BankSavesDataStore {
     private static final String PLUGIN_BASE_GROUP = "bankMemory";
     private static final String CURRENT_LIST_KEY = "currentList";
+    private static final String NAME_MAP_KEY = "nameMap";
 
     private final Object dataLock = new Object();
     private final ConfigManager configManager;
     private final ItemDataParser itemDataParser;
+    private final Map<String, String> nameMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final List<BankSave> currentBankList;
     private final BlockingQueue<ConfigWrite> configWritesQueue = new LinkedBlockingQueue<>();
     private final List<StoredBanksUpdateListener> listeners = new ArrayList<>();
@@ -36,27 +42,32 @@ public class BankSavesDataStore {
         this.configManager = configManager;
         this.itemDataParser = itemDataParser;
         currentBankList = loadCurrentBankList();
+        nameMap.putAll(loadNameMapData());
         Thread configWriter = new Thread(new ConfigWriter(), "Bank Memory config writer");
         configWriter.setDaemon(true);
         configWriter.start();
     }
 
     private List<BankSave> loadCurrentBankList() {
-        String listJsonString = configManager.getConfiguration(PLUGIN_BASE_GROUP, CURRENT_LIST_KEY);
-        if (listJsonString == null) {
+        Type deserialiseType = new TypeToken<List<BankSave>>(){}.getType();
+        return loadDataFromConfig(CURRENT_LIST_KEY, deserialiseType, new ArrayList<>(), "Current bank list");
+    }
+
+    private <T> T loadDataFromConfig(String configKey, Type deserialiseType, T defaultInstance, String dataName) {
+        String jsonString = configManager.getConfiguration(PLUGIN_BASE_GROUP, configKey);
+        if (jsonString == null) {
             // Never set before
-            return new ArrayList<>();
+            return defaultInstance;
         }
 
         Gson gson = buildGson();
-        Type collectionType = new TypeToken<List<BankSave>>(){}.getType();
         try {
-            List<BankSave> list = gson.fromJson(listJsonString, collectionType);
-            return list == null ? new ArrayList<>() : list;
+            T loadedData = gson.fromJson(jsonString, deserialiseType);
+            return loadedData == null ? defaultInstance : loadedData;
         } catch (JsonParseException ex) {
-            log.error("Current bank list json invalid. All is lost", ex);
-            configManager.unsetConfiguration(PLUGIN_BASE_GROUP, CURRENT_LIST_KEY);
-            return new ArrayList<>();
+            log.error("{} json invalid. All is lost", dataName, ex);
+            configManager.unsetConfiguration(PLUGIN_BASE_GROUP, configKey);
+            return defaultInstance;
         }
     }
 
@@ -65,6 +76,36 @@ public class BankSavesDataStore {
         return new GsonBuilder()
                 .registerTypeAdapter(itemDataListType, itemDataParser)
                 .create();
+    }
+
+    private Map<String, String> loadNameMapData() {
+        Type deserialiseType = new TypeToken<HashMap<String, String>>(){}.getType();
+        return loadDataFromConfig(NAME_MAP_KEY, deserialiseType, new HashMap<>(), "Display name map");
+    }
+
+    public void registerDisplayNameForLogin(String login, String displayName) {
+        List<StoredBanksUpdateListener> listenersCopy;
+        boolean changed;
+        synchronized (dataLock) {
+            listenersCopy = new ArrayList<>(listeners);
+            String oldValue = nameMap.put(login, displayName);
+            changed = !Objects.equals(oldValue, displayName);
+            if (changed) {
+                ConfigWrite write = new ConfigWrite(PLUGIN_BASE_GROUP, NAME_MAP_KEY, new HashMap<>(nameMap));
+                scheduleConfigWrite(write);
+            }
+        }
+        if (changed) {
+            listenersCopy.forEach(StoredBanksUpdateListener::displayNameMapUpdated);
+        }
+    }
+
+    public TreeMap<String, String> getCurrentDisplayNameMap() {
+        synchronized (dataLock) {
+            TreeMap<String, String> map = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            map.putAll(nameMap);
+            return map;
+        }
     }
 
     public void addListener(StoredBanksUpdateListener listener) {
@@ -118,6 +159,10 @@ public class BankSavesDataStore {
         currentBankList.add(0, newSave);
         ConfigWrite configWrite = new ConfigWrite(
                 PLUGIN_BASE_GROUP, CURRENT_LIST_KEY, new ArrayList<>(currentBankList));
+        scheduleConfigWrite(configWrite);
+    }
+
+    private void scheduleConfigWrite(ConfigWrite configWrite) {
         try {
             log.debug("Scheduling write for {}.{}", configWrite.configGroup, configWrite.configKey);
             configWritesQueue.put(configWrite);

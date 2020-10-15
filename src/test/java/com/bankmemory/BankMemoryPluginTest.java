@@ -1,5 +1,6 @@
 package com.bankmemory;
 
+import com.bankmemory.data.BankSavesDataStore;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
@@ -38,6 +39,9 @@ public class BankMemoryPluginTest {
     @Mock
     @Bind
     private ItemManager itemManager;
+    @Mock
+    @Bind
+    private BankSavesDataStore bankSavesDataStore;
     @Mock
     private CurrentBankPanelController currentBankPanelController;
     @Mock

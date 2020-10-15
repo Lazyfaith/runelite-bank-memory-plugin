@@ -1,13 +1,17 @@
 package com.bankmemory;
 
 import com.bankmemory.data.BankSave;
+import com.bankmemory.data.BankSavesDataStore;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
+import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.Player;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.eventbus.Subscribe;
@@ -33,10 +37,13 @@ public class BankMemoryPlugin extends Plugin {
     private ClientThread clientThread;
     @Inject
     private ItemManager itemManager;
+    @Inject
+    private BankSavesDataStore dataStore;
 
     private CurrentBankPanelController currentBankPanelController;
 
     private NavigationButton navButton;
+    private boolean displayNameRegistered = false;
 
     @Override
     protected void startUp() throws Exception {
@@ -70,6 +77,21 @@ public class BankMemoryPlugin extends Plugin {
     @Subscribe
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
         currentBankPanelController.onGameStateChanged(gameStateChanged);
+        if (gameStateChanged.getGameState() != GameState.LOGGED_IN) {
+            displayNameRegistered = false;
+        }
+    }
+
+    @Subscribe
+    public void onGameTick(GameTick event) {
+        if (!displayNameRegistered) {
+            Player player = client.getLocalPlayer();
+            String charName = player == null ? null : player.getName();
+            if (charName != null) {
+                displayNameRegistered = true;
+                dataStore.registerDisplayNameForLogin(client.getUsername(), charName);
+            }
+        }
     }
 
     @Subscribe
