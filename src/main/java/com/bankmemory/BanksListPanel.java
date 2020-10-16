@@ -27,6 +27,7 @@ import net.runelite.client.ui.ColorScheme;
 public class BanksListPanel extends JPanel {
 
     private static final String DELETE_SAVE = "Delete save...";
+    private static final String SAVE_AS = "Save as...";
 
     private final JPanel listPanel;
     private final JPopupMenu bankEntryContextMenu;
@@ -51,8 +52,29 @@ public class BanksListPanel extends JPanel {
 
     private JPopupMenu createContextMenu() {
         JPopupMenu menu = new JPopupMenu();
+        menu.add(createMenuSaveAsAction(menu));
         menu.add(createMenuDeleteAction(menu));
         return menu;
+    }
+
+    private Action createMenuSaveAsAction(JPopupMenu menu) {
+        return new AbstractAction(SAVE_AS) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String inputName;
+                do {
+                    inputName = JOptionPane.showInputDialog(
+                            BanksListPanel.this, "Enter name for bank save:", "Save As", JOptionPane.PLAIN_MESSAGE);
+                    if (inputName == null) {
+                        return;
+                    }
+                    inputName = inputName.trim();
+                } while (inputName.isEmpty());
+
+                BanksListEntry save = ((EntryPanel) menu.getInvoker()).entry;
+                interactionListener.saveBankAs(save, inputName);
+            }
+        };
     }
 
     private Action createMenuDeleteAction(JPopupMenu menu) {
@@ -70,7 +92,7 @@ public class BanksListPanel extends JPanel {
         };
     }
 
-    public void updateCurrentBanksList(List<BanksListEntry> entries) {
+    public void updateBanksList(List<BanksListEntry> entries) {
         listPanel.removeAll();
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
@@ -115,7 +137,7 @@ public class BanksListPanel extends JPanel {
             add(new JLabel(entry.getSaveName()), c);
 
             c.gridy = 1;
-            JLabel subText = new JLabel("Current bank");
+            JLabel subText = new JLabel(entry.getSubText());
             subText.setFont(subText.getFont().deriveFont(Font.ITALIC));
             add(subText, c);
 

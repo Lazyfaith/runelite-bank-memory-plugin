@@ -51,6 +51,7 @@ public class SavedBanksPanelController {
     private JPanel contentPanel;
     private BanksListPanel banksListPanel;
     private ImageIcon casketIcon;
+    private ImageIcon notedCasketIcon;
     private BankViewPanel bankViewPanel;
     private JPanel backButtonAndBankName;
     private JLabel bankName;
@@ -63,6 +64,7 @@ public class SavedBanksPanelController {
         contentPanel.setLayout(new BorderLayout());
         banksListPanel = new BanksListPanel(new BanksListInteractionListenerImpl());
         casketIcon = new ImageIcon(itemManager.getImage(405));
+        notedCasketIcon = new ImageIcon(itemManager.getImage(406));
 
         bankViewPanel = new BankViewPanel();
         backButtonAndBankName = new JPanel();
@@ -95,9 +97,15 @@ public class SavedBanksPanelController {
         TreeMap<String, String> displayNameMap = dataStore.getCurrentDisplayNameMap();
         for (BankSave save : dataStore.getCurrentBanksList()) {
             String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
-            saves.add(new BanksListEntry(save.getId(), casketIcon, displayName, save.getDateTimeString()));
+            saves.add(new BanksListEntry(
+                    save.getId(), casketIcon, displayName, "Current bank", save.getDateTimeString()));
         }
-        Runnable updateList = () -> banksListPanel.updateCurrentBanksList(saves);
+        for (BankSave save : dataStore.getNamedBanksList()) {
+            String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
+            saves.add(new BanksListEntry(
+                    save.getId(), notedCasketIcon, save.getSaveName(), displayName, save.getDateTimeString()));
+        }
+        Runnable updateList = () -> banksListPanel.updateBanksList(saves);
         if (SwingUtilities.isEventDispatchThread()) {
             updateList.run();
         } else {
@@ -156,11 +164,26 @@ public class SavedBanksPanelController {
         public void selectedToDelete(BanksListEntry save) {
             dataStore.deleteBankSaveWithId(save.getSaveId());
         }
+
+        @Override
+        public void saveBankAs(BanksListEntry save, String saveName) {
+            Optional<BankSave> existingSave = dataStore.getBankSaveWithId(save.getSaveId());
+            if (existingSave.isPresent()) {
+                dataStore.saveAsNamedBank(saveName, existingSave.get());
+            } else {
+                log.error("Tried to 'Save As' missing bank save: {}", save);
+            }
+        }
     }
 
     private class BanksUpdateListener implements StoredBanksUpdateListener {
         @Override
         public void currentBanksListChanged() {
+            updateCurrentBanksList();
+        }
+
+        @Override
+        public void namedBanksListChanged() {
             updateCurrentBanksList();
         }
 

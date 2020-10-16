@@ -85,7 +85,8 @@ public class CurrentBankPanelControllerTest {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getUsername()).thenReturn("MrSam");
         when(dataStore.getDataForCurrentBank("MrSam")).thenReturn(Optional.of(
-                new BankSave("MrSam", "Tuesday", ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)))));
+                new BankSave("MrSam", "My Bank", "Tuesday",
+                        ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)))));
 
         currentBankPanelController.startUp(panel);
 
@@ -98,9 +99,9 @@ public class CurrentBankPanelControllerTest {
     public void testHandleBankSave_ifItemDataHasNotChangedThenOnlyUpdateTime() throws Exception {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getUsername()).thenReturn("MrSam");
-        BankSave mondaySave = new BankSave("MrSam", "Monday",
+        BankSave mondaySave = new BankSave("MrSam", "My Bank", "Monday",
                 ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)));
-        BankSave tuesdaySave = new BankSave(mondaySave.getUserName(), "Tuesday", mondaySave.getItemData());
+        BankSave tuesdaySave = new BankSave("MrSam", "My Bank", "Tuesday", mondaySave.getItemData());
         currentBankPanelController.startUp(panel);
 
         verify(panel, never()).updateTimeDisplay(any());

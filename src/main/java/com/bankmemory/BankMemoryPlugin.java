@@ -101,6 +101,6 @@ public class BankMemoryPlugin extends Plugin {
             return;
         }
         ItemContainer bank = event.getItemContainer();
-        currentBankPanelController.handleBankSave(BankSave.fromBank(client.getUsername(), bank, itemManager));
+        currentBankPanelController.handleBankSave(BankSave.fromCurrentBank(client.getUsername(), bank, itemManager));
     }
 }

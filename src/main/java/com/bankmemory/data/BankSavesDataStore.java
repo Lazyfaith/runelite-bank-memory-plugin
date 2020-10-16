@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.client.config.ConfigManager;
@@ -27,6 +28,7 @@ import net.runelite.client.config.ConfigManager;
 public class BankSavesDataStore {
     private static final String PLUGIN_BASE_GROUP = "bankMemory";
     private static final String CURRENT_LIST_KEY = "currentList";
+    private static final String NAMED_LIST_KEY = "namedList";
     private static final String NAME_MAP_KEY = "nameMap";
 
     private final Object dataLock = new Object();
@@ -34,6 +36,7 @@ public class BankSavesDataStore {
     private final ItemDataParser itemDataParser;
     private final Map<String, String> nameMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final List<BankSave> currentBankList;
+    private final List<BankSave> namedBanksList;
     private final BlockingQueue<ConfigWrite> configWritesQueue = new LinkedBlockingQueue<>();
     private final List<StoredBanksUpdateListener> listeners = new ArrayList<>();
 
@@ -42,6 +45,7 @@ public class BankSavesDataStore {
         this.configManager = configManager;
         this.itemDataParser = itemDataParser;
         currentBankList = loadCurrentBankList();
+        namedBanksList = loadNamedBankList();
         nameMap.putAll(loadNameMapData());
         Thread configWriter = new Thread(new ConfigWriter(), "Bank Memory config writer");
         configWriter.setDaemon(true);
@@ -69,6 +73,11 @@ public class BankSavesDataStore {
             configManager.unsetConfiguration(PLUGIN_BASE_GROUP, configKey);
             return defaultInstance;
         }
+    }
+
+    private List<BankSave> loadNamedBankList() {
+        Type deserialiseType = new TypeToken<List<BankSave>>(){}.getType();
+        return loadDataFromConfig(NAMED_LIST_KEY, deserialiseType, new ArrayList<>(), "Named bank list");
     }
 
     private Gson buildGson() {
@@ -131,9 +140,15 @@ public class BankSavesDataStore {
         }
     }
 
+    public List<BankSave> getNamedBanksList() {
+        synchronized (dataLock) {
+            return new ArrayList<>(namedBanksList);
+        }
+    }
+
     public Optional<BankSave> getBankSaveWithId(long id) {
         synchronized (dataLock) {
-            return currentBankList.stream()
+            return Stream.concat(currentBankList.stream(), namedBanksList.stream())
                     .filter(s -> s.getId() == id)
                     .findFirst();
         }
@@ -162,6 +177,18 @@ public class BankSavesDataStore {
         scheduleConfigWrite(configWrite);
     }
 
+    public void saveAsNamedBank(String newName, BankSave existingSave) {
+        List<StoredBanksUpdateListener> listenersCopy;
+        synchronized (dataLock) {
+            listenersCopy = new ArrayList<>(listeners);
+            namedBanksList.add(0, BankSave.namedSaveFromExistingBank(newName, existingSave));
+            ConfigWrite configWrite = new ConfigWrite(
+                    PLUGIN_BASE_GROUP, NAMED_LIST_KEY, new ArrayList<>(namedBanksList));
+            scheduleConfigWrite(configWrite);
+        }
+        listenersCopy.forEach(StoredBanksUpdateListener::namedBanksListChanged);
+    }
+
     private void scheduleConfigWrite(ConfigWrite configWrite) {
         try {
             log.debug("Scheduling write for {}.{}", configWrite.configGroup, configWrite.configKey);
@@ -176,27 +203,28 @@ public class BankSavesDataStore {
         boolean changed = false;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
-            changed = deleteBankSaveWithIdImpl(saveId);
+            changed = deleteBankSaveWithIdImpl(saveId, currentBankList, CURRENT_LIST_KEY)
+                    || deleteBankSaveWithIdImpl(saveId, namedBanksList, NAMED_LIST_KEY);
         }
         if (changed) {
             listenersCopy.forEach(StoredBanksUpdateListener::currentBanksListChanged);
+        } else {
+            log.error("Tried deleting missing bank save: {}", saveId);
         }
     }
 
-    private boolean deleteBankSaveWithIdImpl(long id) {
-        Optional<BankSave> save = currentBankList.stream()
+    private boolean deleteBankSaveWithIdImpl(long id, List<BankSave> saveList, String listConfigKey) {
+        Optional<BankSave> save = saveList.stream()
                 .filter(s -> s.getId() == id)
                 .findFirst();
         if (save.isPresent()) {
-            currentBankList.remove(save.get());
+            saveList.remove(save.get());
             ConfigWrite configWrite = new ConfigWrite(
-                    PLUGIN_BASE_GROUP, CURRENT_LIST_KEY, new ArrayList<>(currentBankList));
+                    PLUGIN_BASE_GROUP, listConfigKey, new ArrayList<>(saveList));
             scheduleConfigWrite(configWrite);
             return true;
-        } else {
-            log.error("Tried deleting missing bank save: {}", id);
-            return false;
         }
+        return false;
     }
 
     @AllArgsConstructor

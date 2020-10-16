@@ -6,6 +6,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import javax.annotation.Nullable;
 import lombok.Value;
 import net.runelite.api.ItemContainer;
 import net.runelite.client.game.ItemManager;
@@ -19,17 +20,23 @@ public class BankSave {
     long id;
     String dateTimeString;
     String userName;
+    @Nullable String saveName;
     ImmutableList<BankItem> itemData;
 
     @VisibleForTesting
-    public BankSave(String userName, String dateTimeString, ImmutableList<BankItem> itemData) {
+    public BankSave(
+            String userName,
+            @Nullable String saveName,
+            String dateTimeString,
+            ImmutableList<BankItem> itemData) {
         id = ID_BASE + idIncrementer.incrementAndGet();
         this.userName = userName;
+        this.saveName = saveName;
         this.dateTimeString = dateTimeString;
         this.itemData = itemData;
     }
 
-    public static BankSave fromBank(String userName, ItemContainer bank, ItemManager itemManager) {
+    public static BankSave fromCurrentBank(String userName, ItemContainer bank, ItemManager itemManager) {
         Objects.requireNonNull(bank);
         net.runelite.api.Item[] contents = bank.getItems();
         ImmutableList.Builder<BankItem> itemData = ImmutableList.builder();
@@ -45,6 +52,11 @@ public class BankSave {
             itemData.add(new BankItem(canonId, item.getQuantity()));
         }
         String timeString = DATE_FORMATTER.format(ZonedDateTime.now());
-        return new BankSave(userName, timeString, itemData.build());
+        return new BankSave(userName, null, timeString, itemData.build());
+    }
+
+    public static BankSave namedSaveFromExistingBank(String newName, BankSave existingBank) {
+        Objects.requireNonNull(newName);
+        return new BankSave(existingBank.userName, newName, existingBank.dateTimeString, existingBank.itemData);
     }
 }
