@@ -2,7 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
-import com.bankmemory.data.BankSavesDataStore;
+import com.bankmemory.data.PluginDataStore;
 import com.bankmemory.data.StoredBanksUpdateListener;
 import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
@@ -46,7 +46,7 @@ public class SavedBanksPanelController {
     @Inject
     private ItemManager itemManager;
     @Inject
-    private BankSavesDataStore dataStore;
+    private PluginDataStore dataStore;
 
     private JPanel contentPanel;
     private BanksListPanel banksListPanel;

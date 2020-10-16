@@ -2,13 +2,12 @@ package com.bankmemory;
 
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
-import com.bankmemory.data.BankSavesDataStore;
+import com.bankmemory.data.PluginDataStore;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.testing.fieldbinder.Bind;
 import com.google.inject.testing.fieldbinder.BoundFieldModule;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.SwingUtilities;
@@ -41,7 +40,7 @@ public class CurrentBankPanelControllerTest {
     private ItemManager itemManager;
     @Mock
     @Bind
-    private BankSavesDataStore dataStore;
+    private PluginDataStore dataStore;
     @Mock
     private BankViewPanel panel;
 

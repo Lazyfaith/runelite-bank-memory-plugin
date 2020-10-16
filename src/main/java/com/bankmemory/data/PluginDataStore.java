@@ -25,7 +25,7 @@ import net.runelite.client.config.ConfigManager;
 
 @Slf4j
 @Singleton
-public class BankSavesDataStore {
+public class PluginDataStore {
     private static final String PLUGIN_BASE_GROUP = "bankMemory";
     private static final String CURRENT_LIST_KEY = "currentList";
     private static final String NAMED_LIST_KEY = "namedList";
@@ -41,7 +41,7 @@ public class BankSavesDataStore {
     private final List<StoredBanksUpdateListener> listeners = new ArrayList<>();
 
     @Inject
-    private BankSavesDataStore(ConfigManager configManager, ItemDataParser itemDataParser) {
+    private PluginDataStore(ConfigManager configManager, ItemDataParser itemDataParser) {
         this.configManager = configManager;
         this.itemDataParser = itemDataParser;
         currentBankList = loadCurrentBankList();

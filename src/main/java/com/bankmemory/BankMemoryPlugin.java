@@ -1,7 +1,7 @@
 package com.bankmemory;
 
 import com.bankmemory.data.BankSave;
-import com.bankmemory.data.BankSavesDataStore;
+import com.bankmemory.data.PluginDataStore;
 import com.bankmemory.util.Constants;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
@@ -39,7 +39,7 @@ public class BankMemoryPlugin extends Plugin {
     @Inject
     private ItemManager itemManager;
     @Inject
-    private BankSavesDataStore dataStore;
+    private PluginDataStore dataStore;
 
     private CurrentBankPanelController currentBankPanelController;
 

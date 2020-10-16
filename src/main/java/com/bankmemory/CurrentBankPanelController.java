@@ -2,7 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
-import com.bankmemory.data.BankSavesDataStore;
+import com.bankmemory.data.PluginDataStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +21,7 @@ public class CurrentBankPanelController {
     @Inject
     private ItemManager itemManager;
     @Inject
-    private BankSavesDataStore dataStore;
+    private PluginDataStore dataStore;
 
     private BankViewPanel panel;
 
