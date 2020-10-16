@@ -88,6 +88,7 @@ public class BankViewPanel extends JPanel {
         checkState(SwingUtilities.isEventDispatchThread());
         itemsList.getModel().clearList();
         itemsList.getModel().clearFilter();
+        filterField.setText("");
         resetScrolling();
         removeAll();
         state = DisplayState.RESET;
