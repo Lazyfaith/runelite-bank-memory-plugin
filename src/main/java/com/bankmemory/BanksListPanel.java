@@ -22,6 +22,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.components.PluginErrorPanel;
 
 
 public class BanksListPanel extends JPanel {
@@ -29,6 +30,7 @@ public class BanksListPanel extends JPanel {
     private static final String DELETE_SAVE = "Delete save...";
     private static final String SAVE_AS = "Save as...";
 
+    private final PluginErrorPanel noDataMessage;
     private final JPanel listPanel;
     private final JPopupMenu bankEntryContextMenu;
     private final ListEntryMouseListener mouseListener;
@@ -42,6 +44,10 @@ public class BanksListPanel extends JPanel {
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(Constants.PAD, 0, Constants.PAD, 0));
+
+        noDataMessage = new PluginErrorPanel();
+        noDataMessage.setContent("No bank saves", "You currently do not have any bank saves.");
+        add(noDataMessage, BorderLayout.NORTH);
 
         listPanel = new JPanel(new GridBagLayout());
         JPanel listWrapper = new JPanel(new BorderLayout());
@@ -94,6 +100,17 @@ public class BanksListPanel extends JPanel {
 
     public void updateBanksList(List<BanksListEntry> entries) {
         listPanel.removeAll();
+
+        noDataMessage.setVisible(entries.isEmpty());
+        if (!entries.isEmpty()) {
+            displayListOfBanks(entries);
+        }
+
+        revalidate();
+        repaint();
+    }
+
+    private void displayListOfBanks(List<BanksListEntry> entries) {
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
@@ -106,8 +123,6 @@ public class BanksListPanel extends JPanel {
             listPanel.add(entriesGapPad, c);
             c.gridy++;
         }
-        revalidate();
-        repaint();
     }
 
     private class EntryPanel extends JPanel {
