@@ -64,9 +64,10 @@ public class BankMemoryPlugin extends Plugin {
         clientToolbar.addNavigation(navButton);
 
         currentBankPanelController = injector.getInstance(CurrentBankPanelController.class);
-        SavedBanksPanelController savedBanksPanelController = injector.getInstance(SavedBanksPanelController.class);
         BankViewPanel currentBankView = pluginPanel.getCurrentBankViewPanel();
         clientThread.invokeLater(() -> currentBankPanelController.startUp(currentBankView));
+
+        SavedBanksPanelController savedBanksPanelController = injector.getInstance(SavedBanksPanelController.class);
         savedBanksPanelController.startUp(pluginPanel.getSavedBanksTopPanel());
     }
 

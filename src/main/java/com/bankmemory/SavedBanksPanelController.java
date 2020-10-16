@@ -95,6 +95,7 @@ public class SavedBanksPanelController {
     private void updateCurrentBanksList() {
         List<BanksListEntry> saves = new ArrayList<>();
         TreeMap<String, String> displayNameMap = dataStore.getCurrentDisplayNameMap();
+
         for (BankSave save : dataStore.getCurrentBanksList()) {
             String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
             saves.add(new BanksListEntry(
@@ -105,6 +106,7 @@ public class SavedBanksPanelController {
             saves.add(new BanksListEntry(
                     save.getId(), notedCasketIcon, save.getSaveName(), displayName, save.getDateTimeString()));
         }
+
         Runnable updateList = () -> banksListPanel.updateBanksList(saves);
         if (SwingUtilities.isEventDispatchThread()) {
             updateList.run();
