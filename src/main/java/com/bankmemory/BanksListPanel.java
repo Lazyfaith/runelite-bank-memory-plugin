@@ -34,11 +34,10 @@ public class BanksListPanel extends JPanel {
     private final JPanel listPanel;
     private final JPopupMenu bankEntryContextMenu;
     private final ListEntryMouseListener mouseListener;
-    private final BanksListInteractionListener interactionListener;
+    private BanksListInteractionListener interactionListener;
 
-    public BanksListPanel(BanksListInteractionListener interactionListener) {
+    public BanksListPanel() {
         super();
-        this.interactionListener = interactionListener;
         mouseListener = new ListEntryMouseListener();
         bankEntryContextMenu = createContextMenu();
 
@@ -96,6 +95,10 @@ public class BanksListPanel extends JPanel {
                 }
             }
         };
+    }
+
+    public void setInteractionListener(BanksListInteractionListener listener) {
+        interactionListener = listener;
     }
 
     public void updateBanksList(List<BanksListEntry> entries) {

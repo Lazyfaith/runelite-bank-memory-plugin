@@ -4,40 +4,22 @@ import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.PluginDataStore;
 import com.bankmemory.data.StoredBanksUpdateListener;
-import java.awt.BorderLayout;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
-import net.runelite.client.util.ImageUtil;
-import net.runelite.client.util.SwingUtil;
 
 @Slf4j
 public class SavedBanksPanelController {
-
-    static {
-        BufferedImage backIcon = ImageUtil.getResourceStreamFromClass(SavedBanksPanelController.class, "back_icon.png");
-        BACK_ICON = new ImageIcon(backIcon);
-        BACK_ICON_HOVER = new ImageIcon(ImageUtil.alphaOffset(backIcon, -100));
-    }
-
-    private static final Icon BACK_ICON;
-    private static final Icon BACK_ICON_HOVER;
 
     @Inject
     private Client client;
@@ -48,47 +30,23 @@ public class SavedBanksPanelController {
     @Inject
     private PluginDataStore dataStore;
 
-    private JPanel contentPanel;
-    private BanksListPanel banksListPanel;
+    private BankSavesTopPanel topPanel;
     private ImageIcon casketIcon;
     private ImageIcon notedCasketIcon;
-    private BankViewPanel bankViewPanel;
-    private JPanel backButtonAndBankName;
-    private JLabel bankName;
     private final AtomicBoolean workingToOpenBank = new AtomicBoolean();
 
-    public void startUp(JPanel contentPanel) {
+    public void startUp(BankSavesTopPanel topPanel) {
         assert SwingUtilities.isEventDispatchThread();
 
-        this.contentPanel = contentPanel;
-        contentPanel.setLayout(new BorderLayout());
-        banksListPanel = new BanksListPanel(new BanksListInteractionListenerImpl());
+        this.topPanel = topPanel;
+        topPanel.setBanksListInteractionListener(new BanksListInteractionListenerImpl());
         casketIcon = new ImageIcon(itemManager.getImage(405));
         notedCasketIcon = new ImageIcon(itemManager.getImage(406));
 
-        bankViewPanel = new BankViewPanel();
-        backButtonAndBankName = new JPanel();
-        backButtonAndBankName.setLayout(new BoxLayout(backButtonAndBankName, BoxLayout.LINE_AXIS));
-        JButton backButton = new JButton(BACK_ICON);
-        SwingUtil.removeButtonDecorations(backButton);
-        backButton.setRolloverIcon(BACK_ICON_HOVER);
-        backButton.addActionListener(e -> displayBanksListPanel());
-        bankName = new JLabel();
-        backButtonAndBankName.add(backButton);
-        backButtonAndBankName.add(bankName);
-
-        displayBanksListPanel();
+        topPanel.displayBanksListPanel();
         updateCurrentBanksList();
 
         dataStore.addListener(new BanksUpdateListener());
-    }
-
-    private void displayBanksListPanel() {
-        bankViewPanel.reset();
-        contentPanel.removeAll();
-        contentPanel.add(banksListPanel, BorderLayout.CENTER);
-        contentPanel.revalidate();
-        contentPanel.repaint();
     }
 
     // Gets called on EDT and on game client thread
@@ -107,7 +65,7 @@ public class SavedBanksPanelController {
                     save.getId(), notedCasketIcon, save.getSaveName(), displayName, save.getDateTimeString()));
         }
 
-        Runnable updateList = () -> banksListPanel.updateBanksList(saves);
+        Runnable updateList = () -> topPanel.updateBanksList(saves);
         if (SwingUtilities.isEventDispatchThread()) {
             updateList.run();
         } else {
@@ -135,21 +93,8 @@ public class SavedBanksPanelController {
         }
         SwingUtilities.invokeLater(() -> {
             workingToOpenBank.set(false);
-            displaySavedBankData(selected.getSaveName(), itemNames, itemIcons, foundSave.getDateTimeString());
+            topPanel.displaySavedBankData(selected.getSaveName(), itemNames, itemIcons, foundSave.getDateTimeString());
         });
-    }
-
-    private void displaySavedBankData(String saveName, List<String> itemNames, List<AsyncBufferedImage> itemIcons, String timeString) {
-        assert SwingUtilities.isEventDispatchThread();
-
-        contentPanel.removeAll();
-        bankName.setText(saveName);
-        contentPanel.add(backButtonAndBankName, BorderLayout.NORTH);
-        contentPanel.add(bankViewPanel, BorderLayout.CENTER);
-        bankViewPanel.updateTimeDisplay(timeString);
-        bankViewPanel.displayItemListings(itemNames, itemIcons);
-        contentPanel.revalidate();
-        contentPanel.repaint();
     }
 
     private class BanksListInteractionListenerImpl implements BanksListInteractionListener {

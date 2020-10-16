@@ -15,7 +15,7 @@ import static com.bankmemory.util.Constants.PAD;
 class BankMemoryPluginPanel extends PluginPanel {
 
     private final BankViewPanel currentBankViewPanel = new BankViewPanel();
-    private final JPanel savedBanksTopPanel = new JPanel();
+    private final BankSavesTopPanel savedBanksTopPanel = new BankSavesTopPanel();
 
     private final JPanel displayPanel = new JPanel();
     private final MaterialTabGroup tabGroup = new MaterialTabGroup(displayPanel);
@@ -41,7 +41,7 @@ class BankMemoryPluginPanel extends PluginPanel {
         return currentBankViewPanel;
     }
 
-    JPanel getSavedBanksTopPanel() {
+    BankSavesTopPanel getSavedBanksTopPanel() {
         return savedBanksTopPanel;
     }
 }
