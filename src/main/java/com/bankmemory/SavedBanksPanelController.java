@@ -34,6 +34,7 @@ public class SavedBanksPanelController {
     private ImageIcon casketIcon;
     private ImageIcon notedCasketIcon;
     private final AtomicBoolean workingToOpenBank = new AtomicBoolean();
+    private DataStoreListener dataStoreListener;
 
     public void startUp(BankSavesTopPanel topPanel) {
         assert SwingUtilities.isEventDispatchThread();
@@ -46,7 +47,8 @@ public class SavedBanksPanelController {
         topPanel.displayBanksListPanel();
         updateCurrentBanksList();
 
-        dataStore.addListener(new DataStoreListener());
+        dataStoreListener = new DataStoreListener();
+        dataStore.addListener(dataStoreListener);
     }
 
     // Gets called on EDT and on game client thread
@@ -95,6 +97,10 @@ public class SavedBanksPanelController {
             workingToOpenBank.set(false);
             topPanel.displaySavedBankData(selected.getSaveName(), itemNames, itemIcons, foundSave.getDateTimeString());
         });
+    }
+
+    public void shutDown() {
+        dataStore.removeListener(dataStoreListener);
     }
 
     private class BanksListInteractionListenerImpl implements BanksListInteractionListener {

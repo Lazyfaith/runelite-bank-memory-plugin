@@ -1,5 +1,6 @@
 package com.bankmemory.data;
 
+import com.bankmemory.SavedBanksPanelController;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
@@ -120,6 +121,12 @@ public class PluginDataStore {
     public void addListener(DataStoreUpdateListener listener) {
         synchronized (dataLock) {
             listeners.add(listener);
+        }
+    }
+
+    public void removeListener(DataStoreUpdateListener listener) {
+        synchronized (dataLock) {
+            listeners.remove(listener);
         }
     }
 

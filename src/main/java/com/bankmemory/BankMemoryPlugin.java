@@ -42,6 +42,7 @@ public class BankMemoryPlugin extends Plugin {
     private PluginDataStore dataStore;
 
     private CurrentBankPanelController currentBankPanelController;
+    private SavedBanksPanelController savedBanksPanelController;
 
     private NavigationButton navButton;
     private boolean displayNameRegistered = false;
@@ -68,13 +69,16 @@ public class BankMemoryPlugin extends Plugin {
         BankViewPanel currentBankView = pluginPanel.getCurrentBankViewPanel();
         clientThread.invokeLater(() -> currentBankPanelController.startUp(currentBankView));
 
-        SavedBanksPanelController savedBanksPanelController = injector.getInstance(SavedBanksPanelController.class);
+        savedBanksPanelController = injector.getInstance(SavedBanksPanelController.class);
         savedBanksPanelController.startUp(pluginPanel.getSavedBanksTopPanel());
     }
 
     @Override
     protected void shutDown() {
         clientToolbar.removeNavigation(navButton);
+        savedBanksPanelController.shutDown();
+        currentBankPanelController = null;
+        savedBanksPanelController = null;
     }
 
     @Subscribe
