@@ -25,20 +25,20 @@ public class BankSavesTopPanel extends JPanel {
 
     private final BanksListPanel banksListPanel = new BanksListPanel();
     private final BankViewPanel bankViewPanel = new BankViewPanel();
-    private final JPanel backButtonAndBankName = new JPanel();
-    private final JLabel bankName = new JLabel();
+    private final JPanel backButtonAndTitle = new JPanel();
+    private final JLabel subUiTitle = new JLabel();
 
     public BankSavesTopPanel() {
         super();
         setLayout(new BorderLayout());
 
-        backButtonAndBankName.setLayout(new BoxLayout(backButtonAndBankName, BoxLayout.LINE_AXIS));
+        backButtonAndTitle.setLayout(new BoxLayout(backButtonAndTitle, BoxLayout.LINE_AXIS));
         JButton backButton = new JButton(BACK_ICON);
         SwingUtil.removeButtonDecorations(backButton);
         backButton.setRolloverIcon(BACK_ICON_HOVER);
         backButton.addActionListener(e -> displayBanksListPanel());
-        backButtonAndBankName.add(backButton);
-        backButtonAndBankName.add(bankName);
+        backButtonAndTitle.add(backButton);
+        backButtonAndTitle.add(subUiTitle);
     }
 
     void setBanksListInteractionListener(BanksListInteractionListener listener) {
@@ -59,8 +59,8 @@ public class BankSavesTopPanel extends JPanel {
 
     void displaySavedBankData(String saveName, List<String> itemNames, List<AsyncBufferedImage> itemIcons, String timeString) {
         removeAll();
-        bankName.setText(saveName);
-        add(backButtonAndBankName, BorderLayout.NORTH);
+        subUiTitle.setText(saveName);
+        add(backButtonAndTitle, BorderLayout.NORTH);
         add(bankViewPanel, BorderLayout.CENTER);
         bankViewPanel.updateTimeDisplay(timeString);
         bankViewPanel.displayItemListings(itemNames, itemIcons);
