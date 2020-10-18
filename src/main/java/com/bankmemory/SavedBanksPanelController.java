@@ -59,7 +59,7 @@ public class SavedBanksPanelController {
         for (BankSave save : dataStore.getCurrentBanksList()) {
             String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
             saves.add(new BanksListEntry(
-                    save.getId(), casketIcon, displayName, "Current bank", save.getDateTimeString()));
+                    save.getId(), casketIcon, "Current bank", displayName, save.getDateTimeString()));
         }
         for (BankSave save : dataStore.getNamedBanksList()) {
             String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());

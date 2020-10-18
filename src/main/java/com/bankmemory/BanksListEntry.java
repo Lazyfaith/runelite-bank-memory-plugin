@@ -8,6 +8,6 @@ public class BanksListEntry {
     long saveId;
     ImageIcon icon;
     String saveName;
-    String subText;
+    String accountDisplayName;
     String dateTime;
 }

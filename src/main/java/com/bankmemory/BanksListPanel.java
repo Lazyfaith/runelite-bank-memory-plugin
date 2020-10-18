@@ -155,7 +155,7 @@ public class BanksListPanel extends JPanel {
             add(new JLabel(entry.getSaveName()), c);
 
             c.gridy = 1;
-            JLabel subText = new JLabel(entry.getSubText());
+            JLabel subText = new JLabel(entry.getAccountDisplayName());
             subText.setFont(subText.getFont().deriveFont(Font.ITALIC));
             add(subText, c);
 
