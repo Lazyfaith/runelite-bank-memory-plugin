@@ -50,7 +50,8 @@ public class BankMemoryPlugin extends Plugin {
     protected void startUp() throws Exception {
         assert SwingUtilities.isEventDispatchThread();
 
-        // Doing it here ensures it's created on the EDT
+        // Doing it here ensures it's created on the EDT + the instance is created after the client is all set up
+        // (The latter is important because otherwise lots of L&F values won't be set right and it'll look weird)
         BankMemoryPluginPanel pluginPanel = injector.getInstance(BankMemoryPluginPanel.class);
 
         BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), ICON);
