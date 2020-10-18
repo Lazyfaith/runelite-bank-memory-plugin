@@ -38,7 +38,7 @@ public class PluginDataStore {
     private final List<BankSave> currentBankList;
     private final List<BankSave> namedBanksList;
     private final BlockingQueue<ConfigWrite> configWritesQueue = new LinkedBlockingQueue<>();
-    private final List<StoredBanksUpdateListener> listeners = new ArrayList<>();
+    private final List<DataStoreUpdateListener> listeners = new ArrayList<>();
 
     @Inject
     private PluginDataStore(ConfigManager configManager, ItemDataParser itemDataParser) {
@@ -93,7 +93,7 @@ public class PluginDataStore {
     }
 
     public void registerDisplayNameForLogin(String login, String displayName) {
-        List<StoredBanksUpdateListener> listenersCopy;
+        List<DataStoreUpdateListener> listenersCopy;
         boolean changed;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
@@ -105,7 +105,7 @@ public class PluginDataStore {
             }
         }
         if (changed) {
-            listenersCopy.forEach(StoredBanksUpdateListener::displayNameMapUpdated);
+            listenersCopy.forEach(DataStoreUpdateListener::displayNameMapUpdated);
         }
     }
 
@@ -117,7 +117,7 @@ public class PluginDataStore {
         }
     }
 
-    public void addListener(StoredBanksUpdateListener listener) {
+    public void addListener(DataStoreUpdateListener listener) {
         synchronized (dataLock) {
             listeners.add(listener);
         }
@@ -155,12 +155,12 @@ public class PluginDataStore {
     }
 
     public void saveAsCurrentBank(BankSave newSave) {
-        List<StoredBanksUpdateListener> listenersCopy;
+        List<DataStoreUpdateListener> listenersCopy;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
             saveAsCurrentBankImpl(newSave);
         }
-        listenersCopy.forEach(StoredBanksUpdateListener::currentBanksListChanged);
+        listenersCopy.forEach(DataStoreUpdateListener::currentBanksListChanged);
     }
 
     private void saveAsCurrentBankImpl(BankSave newSave) {
@@ -178,7 +178,7 @@ public class PluginDataStore {
     }
 
     public void saveAsNamedBank(String newName, BankSave existingSave) {
-        List<StoredBanksUpdateListener> listenersCopy;
+        List<DataStoreUpdateListener> listenersCopy;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
             namedBanksList.add(0, BankSave.namedSaveFromExistingBank(newName, existingSave));
@@ -186,7 +186,7 @@ public class PluginDataStore {
                     PLUGIN_BASE_GROUP, NAMED_LIST_KEY, new ArrayList<>(namedBanksList));
             scheduleConfigWrite(configWrite);
         }
-        listenersCopy.forEach(StoredBanksUpdateListener::namedBanksListChanged);
+        listenersCopy.forEach(DataStoreUpdateListener::namedBanksListChanged);
     }
 
     private void scheduleConfigWrite(ConfigWrite configWrite) {
@@ -199,7 +199,7 @@ public class PluginDataStore {
     }
 
     public void deleteBankSaveWithId(long saveId) {
-        List<StoredBanksUpdateListener> listenersCopy;
+        List<DataStoreUpdateListener> listenersCopy;
         boolean changed = false;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
@@ -207,7 +207,7 @@ public class PluginDataStore {
                     || deleteBankSaveWithIdImpl(saveId, namedBanksList, NAMED_LIST_KEY);
         }
         if (changed) {
-            listenersCopy.forEach(StoredBanksUpdateListener::currentBanksListChanged);
+            listenersCopy.forEach(DataStoreUpdateListener::currentBanksListChanged);
         } else {
             log.error("Tried deleting missing bank save: {}", saveId);
         }

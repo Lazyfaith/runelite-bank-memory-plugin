@@ -2,8 +2,8 @@ package com.bankmemory;
 
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
+import com.bankmemory.data.DataStoreUpdateListener;
 import com.bankmemory.data.PluginDataStore;
-import com.bankmemory.data.StoredBanksUpdateListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public class SavedBanksPanelController {
         topPanel.displayBanksListPanel();
         updateCurrentBanksList();
 
-        dataStore.addListener(new BanksUpdateListener());
+        dataStore.addListener(new DataStoreListener());
     }
 
     // Gets called on EDT and on game client thread
@@ -123,7 +123,7 @@ public class SavedBanksPanelController {
         }
     }
 
-    private class BanksUpdateListener implements StoredBanksUpdateListener {
+    private class DataStoreListener implements DataStoreUpdateListener {
         @Override
         public void currentBanksListChanged() {
             updateCurrentBanksList();

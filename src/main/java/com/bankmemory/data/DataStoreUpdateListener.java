@@ -1,6 +1,6 @@
 package com.bankmemory.data;
 
-public interface StoredBanksUpdateListener {
+public interface DataStoreUpdateListener {
     void currentBanksListChanged();
 
     void namedBanksListChanged();
