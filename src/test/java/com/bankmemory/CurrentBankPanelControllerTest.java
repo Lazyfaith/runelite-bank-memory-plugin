@@ -100,7 +100,8 @@ public class CurrentBankPanelControllerTest {
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Tuesday");
         verify(panel).displayItemListings(eq(list(
-                new ItemListEntry("Coins", coinsIcon), new ItemListEntry("Burnt lobster", burntLobsterIcon))));
+                new ItemListEntry("Coins", 100, coinsIcon),
+                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon))));
     }
 
     @Test
@@ -120,7 +121,8 @@ public class CurrentBankPanelControllerTest {
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Monday");
         verify(panel, times(1)).displayItemListings(eq(list(
-                new ItemListEntry("Coins", coinsIcon), new ItemListEntry("Burnt lobster", burntLobsterIcon))));
+                new ItemListEntry("Coins", 100, coinsIcon),
+                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon))));
 
         currentBankPanelController.handleBankSave(tuesdaySave);
 

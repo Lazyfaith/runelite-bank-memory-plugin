@@ -198,7 +198,7 @@ public class FilterableItemListModelTest {
     }
 
     private static ItemListEntry item(String name) {
-        return new ItemListEntry(name, new AsyncBufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
+        return new ItemListEntry(name, 1, new AsyncBufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB));
     }
 
     private static List<ItemListEntry> list(ItemListEntry... items) {

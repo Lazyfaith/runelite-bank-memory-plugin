@@ -91,7 +91,7 @@ public class SavedBanksPanelController {
         for (BankItem i : foundSave.getItemData()) {
             String name = itemManager.getItemComposition(i.getItemId()).getName();
             AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
-            items.add(new ItemListEntry(name, icon));
+            items.add(new ItemListEntry(name, i.getQuantity(), icon));
         }
         SwingUtilities.invokeLater(() -> {
             workingToOpenBank.set(false);

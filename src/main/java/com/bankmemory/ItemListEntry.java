@@ -6,5 +6,6 @@ import net.runelite.client.util.AsyncBufferedImage;
 @Value
 class ItemListEntry {
     String itemName;
+    int quantity;
     AsyncBufferedImage image;
 }
