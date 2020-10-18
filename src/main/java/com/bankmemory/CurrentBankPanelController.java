@@ -54,7 +54,7 @@ public class CurrentBankPanelController {
         if (existingSave.isPresent()) {
             BankSave save = existingSave.get();
             if (latestDisplayedData != null
-                    && !latestDisplayedData.getUserName().equals(save.getUserName())) {
+                    && !latestDisplayedData.getUserName().equalsIgnoreCase(save.getUserName())) {
                 SwingUtilities.invokeLater(panel::reset);
             }
             handleBankSave(existingSave.get());
