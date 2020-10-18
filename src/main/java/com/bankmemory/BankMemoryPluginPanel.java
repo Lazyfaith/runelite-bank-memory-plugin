@@ -1,7 +1,6 @@
 package com.bankmemory;
 
 import java.awt.BorderLayout;
-import javax.inject.Singleton;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import net.runelite.client.ui.PluginPanel;
@@ -11,7 +10,6 @@ import net.runelite.client.ui.components.materialtabs.MaterialTabGroup;
 
 import static com.bankmemory.util.Constants.PAD;
 
-@Singleton
 class BankMemoryPluginPanel extends PluginPanel {
 
     private final BankViewPanel currentBankViewPanel = new BankViewPanel();
