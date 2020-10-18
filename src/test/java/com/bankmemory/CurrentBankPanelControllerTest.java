@@ -101,7 +101,8 @@ public class CurrentBankPanelControllerTest {
         verify(panel).updateTimeDisplay("Tuesday");
         verify(panel).displayItemListings(eq(list(
                 new ItemListEntry("Coins", 100, coinsIcon),
-                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon))));
+                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon))),
+                eq(true));
     }
 
     @Test
@@ -114,7 +115,7 @@ public class CurrentBankPanelControllerTest {
         currentBankPanelController.startUp(panel);
 
         verify(panel, never()).updateTimeDisplay(any());
-        verify(panel, never()).displayItemListings(any());
+        verify(panel, never()).displayItemListings(any(), anyBoolean());
 
         currentBankPanelController.handleBankSave(mondaySave);
 
@@ -122,13 +123,14 @@ public class CurrentBankPanelControllerTest {
         verify(panel).updateTimeDisplay("Monday");
         verify(panel, times(1)).displayItemListings(eq(list(
                 new ItemListEntry("Coins", 100, coinsIcon),
-                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon))));
+                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon))),
+                eq(true));
 
         currentBankPanelController.handleBankSave(tuesdaySave);
 
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Tuesday");
-        verify(panel, times(1)).displayItemListings(any());
+        verify(panel, times(1)).displayItemListings(any(), anyBoolean());
     }
 
     private static ItemComposition mockItemComposition(int id, String name) {

@@ -83,7 +83,7 @@ public class CurrentBankPanelController {
         SwingUtilities.invokeLater(() -> {
             panel.updateTimeDisplay(newSave.getDateTimeString());
             if (isDataNew) {
-                panel.displayItemListings(items);
+                panel.displayItemListings(items, true);
             }
         });
         latestDisplayedData = newSave;

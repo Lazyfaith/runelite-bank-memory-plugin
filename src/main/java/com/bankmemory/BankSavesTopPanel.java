@@ -63,7 +63,7 @@ public class BankSavesTopPanel extends JPanel {
         add(backButtonAndTitle, BorderLayout.NORTH);
         add(bankViewPanel, BorderLayout.CENTER);
         bankViewPanel.updateTimeDisplay(timeString);
-        bankViewPanel.displayItemListings(items);
+        bankViewPanel.displayItemListings(items, false);
         revalidate();
         repaint();
     }

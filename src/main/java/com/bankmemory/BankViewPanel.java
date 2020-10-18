@@ -103,7 +103,7 @@ public class BankViewPanel extends JPanel {
         syncTimeLabel.setText("Data from: " + timeString);
     }
 
-    void displayItemListings(List<ItemListEntry> items) {
+    void displayItemListings(List<ItemListEntry> items, boolean preserveScrollPos) {
         checkState(SwingUtilities.isEventDispatchThread());
 
         ensureDisplayIsInItemListState();
@@ -117,7 +117,11 @@ public class BankViewPanel extends JPanel {
         FilterableItemListModel listModel = itemsList.getModel();
         listModel.setListContents(items);
 
-        itemsScrollPane.getViewport().setViewPosition(scrollPosition);
+        if (preserveScrollPos) {
+            itemsScrollPane.getViewport().setViewPosition(scrollPosition);
+        } else {
+            itemsScrollPane.getViewport().setViewPosition(new Point(0, 0));
+        }
         validate();
     }
 
