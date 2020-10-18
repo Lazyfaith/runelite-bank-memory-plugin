@@ -55,7 +55,7 @@ public class BankSave {
         return new BankSave(userName, null, timeString, itemData.build());
     }
 
-    public static BankSave namedSaveFromExistingBank(String newName, BankSave existingBank) {
+    public static BankSave snapshotFromExistingBank(String newName, BankSave existingBank) {
         Objects.requireNonNull(newName);
         return new BankSave(existingBank.userName, newName, existingBank.dateTimeString, existingBank.itemData);
     }

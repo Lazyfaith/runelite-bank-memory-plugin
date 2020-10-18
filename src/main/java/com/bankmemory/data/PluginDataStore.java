@@ -1,6 +1,5 @@
 package com.bankmemory.data;
 
-import com.bankmemory.SavedBanksPanelController;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
@@ -29,7 +28,7 @@ import net.runelite.client.config.ConfigManager;
 public class PluginDataStore {
     private static final String PLUGIN_BASE_GROUP = "bankMemory";
     private static final String CURRENT_LIST_KEY = "currentList";
-    private static final String NAMED_LIST_KEY = "namedList";
+    private static final String SNAPSHOT_LIST_KEY = "snapshotList";
     private static final String NAME_MAP_KEY = "nameMap";
 
     private final Object dataLock = new Object();
@@ -37,7 +36,7 @@ public class PluginDataStore {
     private final ItemDataParser itemDataParser;
     private final Map<String, String> nameMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final List<BankSave> currentBankList;
-    private final List<BankSave> namedBanksList;
+    private final List<BankSave> snapshotBanksList;
     private final BlockingQueue<ConfigWrite> configWritesQueue = new LinkedBlockingQueue<>();
     private final List<DataStoreUpdateListener> listeners = new ArrayList<>();
 
@@ -46,7 +45,7 @@ public class PluginDataStore {
         this.configManager = configManager;
         this.itemDataParser = itemDataParser;
         currentBankList = loadCurrentBankList();
-        namedBanksList = loadNamedBankList();
+        snapshotBanksList = loadSnapshotBanksList();
         nameMap.putAll(loadNameMapData());
         Thread configWriter = new Thread(new ConfigWriter(), "Bank Memory config writer");
         configWriter.setDaemon(true);
@@ -76,9 +75,9 @@ public class PluginDataStore {
         }
     }
 
-    private List<BankSave> loadNamedBankList() {
+    private List<BankSave> loadSnapshotBanksList() {
         Type deserialiseType = new TypeToken<List<BankSave>>(){}.getType();
-        return loadDataFromConfig(NAMED_LIST_KEY, deserialiseType, new ArrayList<>(), "Named bank list");
+        return loadDataFromConfig(SNAPSHOT_LIST_KEY, deserialiseType, new ArrayList<>(), "Snapshot bank list");
     }
 
     private Gson buildGson() {
@@ -147,15 +146,15 @@ public class PluginDataStore {
         }
     }
 
-    public List<BankSave> getNamedBanksList() {
+    public List<BankSave> getSnapshotBanksList() {
         synchronized (dataLock) {
-            return new ArrayList<>(namedBanksList);
+            return new ArrayList<>(snapshotBanksList);
         }
     }
 
     public Optional<BankSave> getBankSaveWithId(long id) {
         synchronized (dataLock) {
-            return Stream.concat(currentBankList.stream(), namedBanksList.stream())
+            return Stream.concat(currentBankList.stream(), snapshotBanksList.stream())
                     .filter(s -> s.getId() == id)
                     .findFirst();
         }
@@ -184,16 +183,16 @@ public class PluginDataStore {
         scheduleConfigWrite(configWrite);
     }
 
-    public void saveAsNamedBank(String newName, BankSave existingSave) {
+    public void saveAsSnapshotBank(String newName, BankSave existingSave) {
         List<DataStoreUpdateListener> listenersCopy;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
-            namedBanksList.add(0, BankSave.namedSaveFromExistingBank(newName, existingSave));
+            snapshotBanksList.add(0, BankSave.snapshotFromExistingBank(newName, existingSave));
             ConfigWrite configWrite = new ConfigWrite(
-                    PLUGIN_BASE_GROUP, NAMED_LIST_KEY, new ArrayList<>(namedBanksList));
+                    PLUGIN_BASE_GROUP, SNAPSHOT_LIST_KEY, new ArrayList<>(snapshotBanksList));
             scheduleConfigWrite(configWrite);
         }
-        listenersCopy.forEach(DataStoreUpdateListener::namedBanksListChanged);
+        listenersCopy.forEach(DataStoreUpdateListener::snapshotBanksListChanged);
     }
 
     private void scheduleConfigWrite(ConfigWrite configWrite) {
@@ -211,7 +210,7 @@ public class PluginDataStore {
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
             changed = deleteBankSaveWithIdImpl(saveId, currentBankList, CURRENT_LIST_KEY)
-                    || deleteBankSaveWithIdImpl(saveId, namedBanksList, NAMED_LIST_KEY);
+                    || deleteBankSaveWithIdImpl(saveId, snapshotBanksList, SNAPSHOT_LIST_KEY);
         }
         if (changed) {
             listenersCopy.forEach(DataStoreUpdateListener::currentBanksListChanged);

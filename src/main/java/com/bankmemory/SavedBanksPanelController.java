@@ -61,7 +61,7 @@ public class SavedBanksPanelController {
             saves.add(new BanksListEntry(
                     save.getId(), casketIcon, "Current bank", displayName, save.getDateTimeString()));
         }
-        for (BankSave save : dataStore.getNamedBanksList()) {
+        for (BankSave save : dataStore.getSnapshotBanksList()) {
             String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
             saves.add(new BanksListEntry(
                     save.getId(), notedCasketIcon, save.getSaveName(), displayName, save.getDateTimeString()));
@@ -122,7 +122,7 @@ public class SavedBanksPanelController {
         public void saveBankAs(BanksListEntry save, String saveName) {
             Optional<BankSave> existingSave = dataStore.getBankSaveWithId(save.getSaveId());
             if (existingSave.isPresent()) {
-                dataStore.saveAsNamedBank(saveName, existingSave.get());
+                dataStore.saveAsSnapshotBank(saveName, existingSave.get());
             } else {
                 log.error("Tried to 'Save As' missing bank save: {}", save);
             }
@@ -136,7 +136,7 @@ public class SavedBanksPanelController {
         }
 
         @Override
-        public void namedBanksListChanged() {
+        public void snapshotBanksListChanged() {
             updateCurrentBanksList();
         }
 

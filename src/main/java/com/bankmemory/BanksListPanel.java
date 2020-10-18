@@ -28,7 +28,7 @@ import net.runelite.client.ui.components.PluginErrorPanel;
 public class BanksListPanel extends JPanel {
 
     private static final String DELETE_SAVE = "Delete save...";
-    private static final String SAVE_AS = "Save as...";
+    private static final String SAVE_SNAPSHOT = "Save snapshot...";
 
     private final PluginErrorPanel noDataMessage;
     private final JPanel listPanel;
@@ -63,13 +63,13 @@ public class BanksListPanel extends JPanel {
     }
 
     private Action createMenuSaveAsAction(JPopupMenu menu) {
-        return new AbstractAction(SAVE_AS) {
+        return new AbstractAction(SAVE_SNAPSHOT) {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String inputName;
                 do {
                     inputName = JOptionPane.showInputDialog(
-                            BanksListPanel.this, "Enter name for bank save:", "Save As", JOptionPane.PLAIN_MESSAGE);
+                            BanksListPanel.this, "Enter name for new bank snapshot:", "Save Snapshot As", JOptionPane.PLAIN_MESSAGE);
                     if (inputName == null) {
                         return;
                     }
