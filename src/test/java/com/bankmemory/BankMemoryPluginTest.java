@@ -20,6 +20,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -46,6 +47,8 @@ public class BankMemoryPluginTest {
     @Mock
     private SavedBanksPanelController savedBanksPanelController;
     @Mock
+    private BankDiffPanelController bankDiffPanelController;
+    @Mock
     private BankMemoryPluginPanel pluginPanel;
     @Mock
     private Injector pluginInjector;
@@ -60,6 +63,8 @@ public class BankMemoryPluginTest {
         when(pluginInjector.getInstance(BankMemoryPluginPanel.class)).thenReturn(pluginPanel);
         when(pluginInjector.getInstance(CurrentBankPanelController.class)).thenReturn(currentBankPanelController);
         when(pluginInjector.getInstance(SavedBanksPanelController.class)).thenReturn(savedBanksPanelController);
+        when(pluginInjector.getInstance(BankDiffPanelController.class)).thenReturn(bankDiffPanelController);
+        when(pluginPanel.getSavedBanksTopPanel()).thenReturn(mock(BankSavesTopPanel.class));
     }
 
     @Test

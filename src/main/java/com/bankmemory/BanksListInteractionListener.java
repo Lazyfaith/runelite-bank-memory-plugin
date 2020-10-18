@@ -6,4 +6,6 @@ public interface BanksListInteractionListener {
     void selectedToDelete(BanksListEntry save);
 
     void saveBankAs(BanksListEntry save, String saveName);
+
+    void openBanksDiffPanel();
 }

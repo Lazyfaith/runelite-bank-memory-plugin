@@ -15,6 +15,7 @@ import java.util.List;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -33,6 +34,7 @@ public class BanksListPanel extends JPanel {
     private final PluginErrorPanel noDataMessage;
     private final JPanel listPanel;
     private final JPopupMenu bankEntryContextMenu;
+    private final JButton compareBanks;
     private final ListEntryMouseListener mouseListener;
     private BanksListInteractionListener interactionListener;
 
@@ -53,6 +55,10 @@ public class BanksListPanel extends JPanel {
         listWrapper.add(listPanel, BorderLayout.NORTH);
         JScrollPane scrollPane = new JScrollPane(listWrapper);
         add(scrollPane, BorderLayout.CENTER);
+
+        compareBanks = new JButton("Compare bank saves");
+        compareBanks.addActionListener(a -> interactionListener.openBanksDiffPanel());
+        add(compareBanks, BorderLayout.SOUTH);
     }
 
     private JPopupMenu createContextMenu() {

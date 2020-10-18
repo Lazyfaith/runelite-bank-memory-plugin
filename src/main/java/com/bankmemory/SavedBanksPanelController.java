@@ -127,6 +127,11 @@ public class SavedBanksPanelController {
                 log.error("Tried to 'Save As' missing bank save: {}", save);
             }
         }
+
+        @Override
+        public void openBanksDiffPanel() {
+            topPanel.showBankDiffPanel();
+        }
     }
 
     private class DataStoreListener implements DataStoreUpdateListener {

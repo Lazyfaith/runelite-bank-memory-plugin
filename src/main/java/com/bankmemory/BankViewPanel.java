@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
@@ -145,6 +146,10 @@ public class BankViewPanel extends JPanel {
         if (itemsList.getFirstVisibleIndex() <= unfilteredIndex && unfilteredIndex <= itemsList.getLastVisibleIndex()) {
             itemsList.repaint(itemsList.getCellBounds(adjustedIndex, adjustedIndex));
         }
+    }
+
+    void setItemsListRenderer(ListCellRenderer<ItemListEntry> renderer) {
+        itemsList.setCellRenderer(renderer);
     }
 
     private static class ItemList extends JList<ItemListEntry> {
