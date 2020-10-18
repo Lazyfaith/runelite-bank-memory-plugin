@@ -86,16 +86,16 @@ public class SavedBanksPanelController {
         }
         BankSave foundSave = save.get();
 
-        List<String> itemNames = new ArrayList<>();
-        List<AsyncBufferedImage> itemIcons = new ArrayList<>();
+        List<ItemListEntry> items = new ArrayList<>();
 
         for (BankItem i : foundSave.getItemData()) {
-            itemNames.add(itemManager.getItemComposition(i.getItemId()).getName());
-            itemIcons.add(itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1));
+            String name = itemManager.getItemComposition(i.getItemId()).getName();
+            AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
+            items.add(new ItemListEntry(name, icon));
         }
         SwingUtilities.invokeLater(() -> {
             workingToOpenBank.set(false);
-            topPanel.displaySavedBankData(selected.getSaveName(), itemNames, itemIcons, foundSave.getDateTimeString());
+            topPanel.displaySavedBankData(selected.getSaveName(), items, foundSave.getDateTimeString());
         });
     }
 

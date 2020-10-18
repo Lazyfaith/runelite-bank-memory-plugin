@@ -57,13 +57,13 @@ public class BankSavesTopPanel extends JPanel {
         banksListPanel.updateBanksList(entries);
     }
 
-    void displaySavedBankData(String saveName, List<String> itemNames, List<AsyncBufferedImage> itemIcons, String timeString) {
+    void displaySavedBankData(String saveName, List<ItemListEntry> items, String timeString) {
         removeAll();
         subUiTitle.setText(saveName);
         add(backButtonAndTitle, BorderLayout.NORTH);
         add(bankViewPanel, BorderLayout.CENTER);
         bankViewPanel.updateTimeDisplay(timeString);
-        bankViewPanel.displayItemListings(itemNames, itemIcons);
+        bankViewPanel.displayItemListings(items);
         revalidate();
         repaint();
     }

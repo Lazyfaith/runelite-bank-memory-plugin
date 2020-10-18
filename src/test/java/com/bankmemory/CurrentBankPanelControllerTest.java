@@ -15,6 +15,7 @@ import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ItemComposition;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.util.AsyncBufferedImage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,6 +24,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -47,6 +50,9 @@ public class CurrentBankPanelControllerTest {
     @Inject
     private CurrentBankPanelController currentBankPanelController;
 
+    @Mock private AsyncBufferedImage coinsIcon;
+    @Mock private AsyncBufferedImage burntLobsterIcon;
+
     @Before
     public void before() {
         Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
@@ -55,6 +61,8 @@ public class CurrentBankPanelControllerTest {
         ItemComposition burntLobster = mockItemComposition(2, "Burnt lobster");
         when(itemManager.getItemComposition(0)).thenReturn(coins);
         when(itemManager.getItemComposition(2)).thenReturn(burntLobster);
+        when(itemManager.getImage(eq(0), anyInt(), anyBoolean())).thenReturn(coinsIcon);
+        when(itemManager.getImage(eq(2), anyInt(), anyBoolean())).thenReturn(burntLobsterIcon);
     }
 
     @Test
@@ -91,7 +99,8 @@ public class CurrentBankPanelControllerTest {
 
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Tuesday");
-        verify(panel).displayItemListings(eq(list("Coins", "Burnt lobster")), any());
+        verify(panel).displayItemListings(eq(list(
+                new ItemListEntry("Coins", coinsIcon), new ItemListEntry("Burnt lobster", burntLobsterIcon))));
     }
 
     @Test
@@ -104,19 +113,20 @@ public class CurrentBankPanelControllerTest {
         currentBankPanelController.startUp(panel);
 
         verify(panel, never()).updateTimeDisplay(any());
-        verify(panel, never()).displayItemListings(any(), any());
+        verify(panel, never()).displayItemListings(any());
 
         currentBankPanelController.handleBankSave(mondaySave);
 
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Monday");
-        verify(panel, times(1)).displayItemListings(eq(list("Coins", "Burnt lobster")), any());
+        verify(panel, times(1)).displayItemListings(eq(list(
+                new ItemListEntry("Coins", coinsIcon), new ItemListEntry("Burnt lobster", burntLobsterIcon))));
 
         currentBankPanelController.handleBankSave(tuesdaySave);
 
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Tuesday");
-        verify(panel, times(1)).displayItemListings(any(), any());
+        verify(panel, times(1)).displayItemListings(any());
     }
 
     private static ItemComposition mockItemComposition(int id, String name) {
@@ -129,7 +139,7 @@ public class CurrentBankPanelControllerTest {
         SwingUtilities.invokeAndWait(() -> { /* Do nothing */ });
     }
 
-    private static List<String> list(String... strings) {
-        return List.of(strings);
+    private static List<ItemListEntry> list(ItemListEntry... items) {
+        return List.of(items);
     }
 }

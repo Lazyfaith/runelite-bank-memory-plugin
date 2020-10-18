@@ -103,22 +103,19 @@ public class BankViewPanel extends JPanel {
         syncTimeLabel.setText("Data from: " + timeString);
     }
 
-    void displayItemListings(List<String> names, List<AsyncBufferedImage> icons) {
+    void displayItemListings(List<ItemListEntry> items) {
         checkState(SwingUtilities.isEventDispatchThread());
-        checkArgument(names.size() == icons.size());
 
         ensureDisplayIsInItemListState();
         Point scrollPosition = itemsScrollPane.getViewport().getViewPosition();
 
-        List<ItemListEntry> itemData = new ArrayList<>();
-        for (int i = 0; i < names.size(); i++) {
-            AsyncBufferedImage img = icons.get(i);
+        for (int i = 0; i < items.size(); i++) {
+            AsyncBufferedImage img = items.get(i).getImage();
             int unfilteredRow = i;
             img.onLoaded(() -> repaintItemEntryIfRowVisible(unfilteredRow));
-            itemData.add(new ItemListEntry(names.get(i), img));
         }
         FilterableItemListModel listModel = itemsList.getModel();
-        listModel.setListContents(itemData);
+        listModel.setListContents(items);
 
         itemsScrollPane.getViewport().setViewPosition(scrollPosition);
         validate();

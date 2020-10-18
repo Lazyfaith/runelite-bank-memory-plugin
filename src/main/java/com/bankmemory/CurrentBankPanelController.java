@@ -70,22 +70,20 @@ public class CurrentBankPanelController {
         dataStore.saveAsCurrentBank(newSave);
 
         boolean isDataNew = isItemDataNew(newSave);
-        List<String> names = new ArrayList<>();
-        List<AsyncBufferedImage> icons = new ArrayList<>();
+        List<ItemListEntry> items = new ArrayList<>();
         if (isDataNew) {
             // Get all the data we need for the UI on this thread (the game thread)
             // Doing it on the EDT seems to cause random crashes & NPEs
             for (BankItem i : newSave.getItemData()) {
-                names.add(itemManager.getItemComposition(i.getItemId()).getName());
-                icons.add(itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1));
+                String name = itemManager.getItemComposition(i.getItemId()).getName();
+                AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
+                items.add(new ItemListEntry(name, icon));
             }
         }
         SwingUtilities.invokeLater(() -> {
             panel.updateTimeDisplay(newSave.getDateTimeString());
             if (isDataNew) {
-                assert names.size() == newSave.getItemData().size();
-                assert icons.size() == newSave.getItemData().size();
-                panel.displayItemListings(names, icons);
+                panel.displayItemListings(items);
             }
         });
         latestDisplayedData = newSave;
