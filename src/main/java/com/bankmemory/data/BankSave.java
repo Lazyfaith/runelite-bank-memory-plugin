@@ -2,7 +2,6 @@ package com.bankmemory.data;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

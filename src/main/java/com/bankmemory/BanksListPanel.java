@@ -34,7 +34,6 @@ public class BanksListPanel extends JPanel {
     private final PluginErrorPanel noDataMessage;
     private final JPanel listPanel;
     private final JPopupMenu bankEntryContextMenu;
-    private final JButton compareBanks;
     private final ListEntryMouseListener mouseListener;
     private BanksListInteractionListener interactionListener;
 
@@ -56,7 +55,7 @@ public class BanksListPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(listWrapper);
         add(scrollPane, BorderLayout.CENTER);
 
-        compareBanks = new JButton("Compare bank saves");
+        JButton compareBanks = new JButton("Compare bank saves");
         compareBanks.addActionListener(a -> interactionListener.openBanksDiffPanel());
         add(compareBanks, BorderLayout.SOUTH);
     }
