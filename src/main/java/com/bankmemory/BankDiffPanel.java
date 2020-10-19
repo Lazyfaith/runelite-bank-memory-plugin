@@ -122,8 +122,10 @@ public class BankDiffPanel extends JPanel {
         disableSelectionListener = true;
         beforeOptionsModel.removeAllElements();
         afterOptionsModel.removeAllElements();
-        beforeOptionsModel.addAll(options);
-        afterOptionsModel.addAll(options);
+        options.forEach(o -> {
+            beforeOptionsModel.addElement(o);
+            afterOptionsModel.addElement(o);
+        });
         disableSelectionListener = false;
     }
 

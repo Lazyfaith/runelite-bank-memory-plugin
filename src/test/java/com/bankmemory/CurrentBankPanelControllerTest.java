@@ -4,6 +4,7 @@ import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.PluginDataStore;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.testing.fieldbinder.Bind;
@@ -144,6 +145,6 @@ public class CurrentBankPanelControllerTest {
     }
 
     private static List<ItemListEntry> list(ItemListEntry... items) {
-        return List.of(items);
+        return Lists.newArrayList(items);
     }
 }

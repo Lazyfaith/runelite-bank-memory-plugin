@@ -1,5 +1,6 @@
 package com.bankmemory;
 
+import com.google.common.collect.Lists;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import javax.swing.event.ListDataListener;
@@ -202,6 +203,6 @@ public class FilterableItemListModelTest {
     }
 
     private static List<ItemListEntry> list(ItemListEntry... items) {
-        return List.of(items);
+        return Lists.newArrayList(items);
     }
 }
