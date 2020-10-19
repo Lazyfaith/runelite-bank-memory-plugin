@@ -1,6 +1,7 @@
 package com.bankmemory;
 
 import com.bankmemory.data.BankSave;
+import lombok.ToString;
 import lombok.Value;
 
 @Value
@@ -11,5 +12,5 @@ public class BankDiffListOption {
 
     String listText;
     Type bankType;
-    BankSave save;
+    @ToString.Exclude BankSave save;
 }

@@ -3,6 +3,7 @@ package com.bankmemory;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.DataStoreUpdateListener;
+import com.bankmemory.data.DisplayNameMapper;
 import com.bankmemory.data.PluginDataStore;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,15 +55,15 @@ public class SavedBanksPanelController {
     // Gets called on EDT and on game client thread
     private void updateCurrentBanksList() {
         List<BanksListEntry> saves = new ArrayList<>();
-        TreeMap<String, String> displayNameMap = dataStore.getCurrentDisplayNameMap();
+        DisplayNameMapper nameMapper = dataStore.getDisplayNameMapper();
 
         for (BankSave save : dataStore.getCurrentBanksList()) {
-            String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
+            String displayName = nameMapper.map(save.getUserName());
             saves.add(new BanksListEntry(
                     save.getId(), casketIcon, "Current bank", displayName, save.getDateTimeString()));
         }
         for (BankSave save : dataStore.getSnapshotBanksList()) {
-            String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
+            String displayName = nameMapper.map(save.getUserName());
             saves.add(new BanksListEntry(
                     save.getId(), notedCasketIcon, save.getSaveName(), displayName, save.getDateTimeString()));
         }

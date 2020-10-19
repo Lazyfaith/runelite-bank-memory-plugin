@@ -4,10 +4,10 @@ import com.bankmemory.BankDiffListOption.Type;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.DataStoreUpdateListener;
+import com.bankmemory.data.DisplayNameMapper;
 import com.bankmemory.data.PluginDataStore;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
@@ -49,10 +49,10 @@ public class BankDiffPanelController {
 
         List<BankDiffListOption> currentBanks = new ArrayList<>();
         List<BankDiffListOption> snapshotBanks = new ArrayList<>();
-        TreeMap<String, String> displayNameMap = dataStore.getCurrentDisplayNameMap();
+        DisplayNameMapper nameMapper = dataStore.getDisplayNameMapper();
 
         for (BankSave save : dataStore.getCurrentBanksList()) {
-            String displayName = displayNameMap.getOrDefault(save.getUserName(), save.getUserName());
+            String displayName = nameMapper.map(save.getUserName());
             currentBanks.add(new BankDiffListOption(displayName, Type.CURRENT, save));
         }
         for (BankSave save : dataStore.getSnapshotBanksList()) {

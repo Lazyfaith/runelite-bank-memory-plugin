@@ -109,11 +109,9 @@ public class PluginDataStore {
         }
     }
 
-    public TreeMap<String, String> getCurrentDisplayNameMap() {
+    public DisplayNameMapper getDisplayNameMapper() {
         synchronized (dataLock) {
-            TreeMap<String, String> map = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-            map.putAll(nameMap);
-            return map;
+            return new DisplayNameMapper(nameMap);
         }
     }
 

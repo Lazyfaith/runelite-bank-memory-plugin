@@ -1,6 +1,8 @@
 package com.bankmemory.data;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.MoreObjects;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +16,7 @@ import net.runelite.client.game.ItemManager;
 @Value
 public class BankSave {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss, d MMM uuuu");
+    private static final SaferUsernameFunction SAFER_USERNAME = new SaferUsernameFunction();
     private static final long ID_BASE = System.currentTimeMillis();
     private static final AtomicInteger idIncrementer = new AtomicInteger();
 
@@ -58,5 +61,16 @@ public class BankSave {
     public static BankSave snapshotFromExistingBank(String newName, BankSave existingBank) {
         Objects.requireNonNull(newName);
         return new BankSave(existingBank.userName, newName, existingBank.dateTimeString, existingBank.itemData);
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("id", id)
+                .add("username", SAFER_USERNAME.from(userName))
+                .add("dateTimeString", dateTimeString)
+                .add("saveName", saveName)
+                .add("itemData", itemData)
+                .toString();
     }
 }
