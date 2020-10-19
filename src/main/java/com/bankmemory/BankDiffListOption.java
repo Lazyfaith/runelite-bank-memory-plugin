@@ -9,7 +9,7 @@ public class BankDiffListOption {
         CURRENT, SNAPSHOT
     }
 
-    String listTest;
+    String listText;
     Type bankType;
     BankSave save;
 }

@@ -173,7 +173,7 @@ public class BankDiffPanel extends JPanel {
                 boolean cellHasFocus) {
             Object valToRender = value == null ? "" : value; // else ComboBoxListRenderer breaks
             if (value instanceof BankDiffListOption) {
-                valToRender = ((BankDiffListOption) value).getListTest();
+                valToRender = ((BankDiffListOption) value).getListText();
             }
 
             Component comp = wrapped.getListCellRendererComponent(list, valToRender, index, isSelected, cellHasFocus);
