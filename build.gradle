@@ -25,7 +25,6 @@ dependencies {
 
     testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
-    compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
     testCompile group: 'com.google.inject.extensions', name: 'guice-testlib', version: '4.1.0'
 }
 
