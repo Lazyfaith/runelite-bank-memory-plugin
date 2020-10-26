@@ -1,6 +1,6 @@
-# Bank Memory
+# Bank Memory [![Active Installs](http://img.shields.io/endpoint?url=https://i.pluginhub.info/shields/installs/plugin/bank-memory)](https://runelite.net/plugin-hub/LazyFaith)
 
-A plugin for RuneLite which remembers the contents of your bank and displays that in a searchable interface.
+A plugin for [RuneLite](https://github.com/runelite/runelite) which remembers the contents of your bank and displays that in a searchable interface.
 
 Features:
 - Remembers the bank contents of all your accounts
