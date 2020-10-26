@@ -36,20 +36,12 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CurrentBankPanelControllerTest {
-    @Mock
-    @Bind
-    private Client client;
-    @Mock
-    @Bind
-    private ItemManager itemManager;
-    @Mock
-    @Bind
-    private PluginDataStore dataStore;
-    @Mock
-    private BankViewPanel panel;
+    @Mock @Bind private Client client;
+    @Mock @Bind private ItemManager itemManager;
+    @Mock @Bind private PluginDataStore dataStore;
+    @Mock private BankViewPanel panel;
 
-    @Inject
-    private CurrentBankPanelController currentBankPanelController;
+    @Inject private CurrentBankPanelController currentBankPanelController;
 
     @Mock private AsyncBufferedImage coinsIcon;
     @Mock private AsyncBufferedImage burntLobsterIcon;

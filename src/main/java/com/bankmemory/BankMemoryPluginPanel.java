@@ -15,17 +15,14 @@ class BankMemoryPluginPanel extends PluginPanel {
     private final BankViewPanel currentBankViewPanel = new BankViewPanel();
     private final BankSavesTopPanel savedBanksTopPanel = new BankSavesTopPanel();
 
-    private final JPanel displayPanel = new JPanel();
-    private final MaterialTabGroup tabGroup = new MaterialTabGroup(displayPanel);
-    private final MaterialTab currentBankTab;
-    private final MaterialTab savesListTab;
-
     protected BankMemoryPluginPanel() {
         super(false);
         setBorder(BorderFactory.createEmptyBorder(PAD, PAD, PAD, PAD));
 
-        currentBankTab = new MaterialTab("Current bank", tabGroup, currentBankViewPanel);
-        savesListTab = new MaterialTab("Saved banks", tabGroup, savedBanksTopPanel);
+        JPanel displayPanel = new JPanel();
+        MaterialTabGroup tabGroup = new MaterialTabGroup(displayPanel);
+        MaterialTab currentBankTab = new MaterialTab("Current bank", tabGroup, currentBankViewPanel);
+        MaterialTab savesListTab = new MaterialTab("Saved banks", tabGroup, savedBanksTopPanel);
         tabGroup.addTab(currentBankTab);
         tabGroup.addTab(savesListTab);
         tabGroup.select(currentBankTab);

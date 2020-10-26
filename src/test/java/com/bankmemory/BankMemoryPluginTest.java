@@ -27,34 +27,18 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BankMemoryPluginTest {
-    @Mock
-    @Bind
-    private ClientToolbar clientToolbar;
-    @Mock
-    @Bind
-    private Client client;
-    @Mock
-    @Bind
-    private ClientThread clientThread;
-    @Mock
-    @Bind
-    private ItemManager itemManager;
-    @Mock
-    @Bind
-    private PluginDataStore pluginDataStore;
-    @Mock
-    private CurrentBankPanelController currentBankPanelController;
-    @Mock
-    private SavedBanksPanelController savedBanksPanelController;
-    @Mock
-    private BankDiffPanelController bankDiffPanelController;
-    @Mock
-    private BankMemoryPluginPanel pluginPanel;
-    @Mock
-    private Injector pluginInjector;
+    @Mock @Bind private ClientToolbar clientToolbar;
+    @Mock @Bind private Client client;
+    @Mock @Bind private ClientThread clientThread;
+    @Mock @Bind private ItemManager itemManager;
+    @Mock @Bind private PluginDataStore pluginDataStore;
+    @Mock private CurrentBankPanelController currentBankPanelController;
+    @Mock private SavedBanksPanelController savedBanksPanelController;
+    @Mock private BankDiffPanelController bankDiffPanelController;
+    @Mock private BankMemoryPluginPanel pluginPanel;
+    @Mock private Injector pluginInjector;
 
-    @Inject
-    private TestBankMemoryPlugin bankMemoryPlugin;
+    @Inject private TestBankMemoryPlugin bankMemoryPlugin;
 
     @Before
     public void before() {

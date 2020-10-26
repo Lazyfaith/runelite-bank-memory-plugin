@@ -13,7 +13,6 @@ import org.junit.runners.Parameterized.Parameters;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
 import static org.junit.Assert.fail;
 
 @RunWith(Parameterized.class)

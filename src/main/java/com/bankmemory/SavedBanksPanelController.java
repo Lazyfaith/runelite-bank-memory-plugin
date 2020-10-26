@@ -8,7 +8,6 @@ import com.bankmemory.data.PluginDataStore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
@@ -22,14 +21,10 @@ import net.runelite.client.util.AsyncBufferedImage;
 @Slf4j
 public class SavedBanksPanelController {
 
-    @Inject
-    private Client client;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
-    private ItemManager itemManager;
-    @Inject
-    private PluginDataStore dataStore;
+    @Inject private Client client;
+    @Inject private ClientThread clientThread;
+    @Inject private ItemManager itemManager;
+    @Inject private PluginDataStore dataStore;
 
     private BankSavesTopPanel topPanel;
     private ImageIcon casketIcon;

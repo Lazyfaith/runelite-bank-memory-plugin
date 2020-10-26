@@ -16,17 +16,13 @@ import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
 
 public class CurrentBankPanelController {
-    @Inject
-    private Client client;
-    @Inject
-    private ItemManager itemManager;
-    @Inject
-    private PluginDataStore dataStore;
+    @Inject private Client client;
+    @Inject private ItemManager itemManager;
+    @Inject private PluginDataStore dataStore;
 
     private BankViewPanel panel;
 
-    @Nullable
-    private BankSave latestDisplayedData = null;
+    @Nullable private BankSave latestDisplayedData = null;
 
     public void startUp(BankViewPanel panel) {
         assert client.isClientThread();

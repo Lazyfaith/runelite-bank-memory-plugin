@@ -19,16 +19,11 @@ import net.runelite.client.util.AsyncBufferedImage;
 @Slf4j
 public class BankDiffPanelController {
 
-    @Inject
-    private Client client;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
-    private ItemManager itemManager;
-    @Inject
-    private PluginDataStore dataStore;
-    @Inject
-    private ItemListDiffGenerator diffGenerator;
+    @Inject private Client client;
+    @Inject private ClientThread clientThread;
+    @Inject private ItemManager itemManager;
+    @Inject private PluginDataStore dataStore;
+    @Inject private ItemListDiffGenerator diffGenerator;
 
     private BankDiffPanel diffPanel;
     private DataUpdateListener dataListener;

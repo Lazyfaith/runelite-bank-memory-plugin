@@ -30,16 +30,11 @@ import net.runelite.client.util.ImageUtil;
 public class BankMemoryPlugin extends Plugin {
     private static final String ICON = "bank_memory_icon.png";
 
-    @Inject
-    private ClientToolbar clientToolbar;
-    @Inject
-    private Client client;
-    @Inject
-    private ClientThread clientThread;
-    @Inject
-    private ItemManager itemManager;
-    @Inject
-    private PluginDataStore dataStore;
+    @Inject private ClientToolbar clientToolbar;
+    @Inject private Client client;
+    @Inject private ClientThread clientThread;
+    @Inject private ItemManager itemManager;
+    @Inject private PluginDataStore dataStore;
 
     private CurrentBankPanelController currentBankPanelController;
     private SavedBanksPanelController savedBanksPanelController;

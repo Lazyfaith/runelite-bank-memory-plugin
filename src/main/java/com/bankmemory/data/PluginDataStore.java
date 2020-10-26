@@ -204,7 +204,7 @@ public class PluginDataStore {
 
     public void deleteBankSaveWithId(long saveId) {
         List<DataStoreUpdateListener> listenersCopy;
-        boolean changed = false;
+        boolean changed;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
             changed = deleteBankSaveWithIdImpl(saveId, currentBankList, CURRENT_LIST_KEY)
