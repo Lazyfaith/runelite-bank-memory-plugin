@@ -12,6 +12,7 @@ import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.ItemComposition;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
@@ -112,10 +113,12 @@ public class BankDiffPanelController {
         List<ItemListEntry> items = new ArrayList<>();
 
         for (BankItem i : differences) {
-            String name = itemManager.getItemComposition(i.getItemId()).getName();
+            ItemComposition ic = itemManager.getItemComposition(i.getItemId());
             // Quantity num is painted by renderer, but still give quantity so item stacks show nicely
             AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), false);
-            items.add(new ItemListEntry(name, i.getQuantity(), icon));
+            int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
+            int haValue = ic.getHaPrice() * i.getQuantity();
+            items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
         }
 
         SwingUtilities.invokeLater(() -> diffPanel.displayItems(items, keepListPosition));

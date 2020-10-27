@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
+import net.runelite.api.ItemComposition;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
@@ -71,9 +72,11 @@ public class CurrentBankPanelController {
             // Get all the data we need for the UI on this thread (the game thread)
             // Doing it on the EDT seems to cause random crashes & NPEs
             for (BankItem i : newSave.getItemData()) {
-                String name = itemManager.getItemComposition(i.getItemId()).getName();
+                ItemComposition ic = itemManager.getItemComposition(i.getItemId());
                 AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
-                items.add(new ItemListEntry(name, i.getQuantity(), icon));
+                int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
+                int haValue = ic.getHaPrice() * i.getQuantity();
+                items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
             }
         }
         SwingUtilities.invokeLater(() -> {

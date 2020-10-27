@@ -50,12 +50,14 @@ public class CurrentBankPanelControllerTest {
     public void before() {
         Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
         when(client.isClientThread()).thenReturn(true);
-        ItemComposition coins = mockItemComposition(0, "Coins");
-        ItemComposition burntLobster = mockItemComposition(2, "Burnt lobster");
+        ItemComposition coins = mockItemComposition("Coins", 1);
+        ItemComposition burntLobster = mockItemComposition("Burnt lobster", 10);
         when(itemManager.getItemComposition(0)).thenReturn(coins);
         when(itemManager.getItemComposition(2)).thenReturn(burntLobster);
         when(itemManager.getImage(eq(0), anyInt(), anyBoolean())).thenReturn(coinsIcon);
         when(itemManager.getImage(eq(2), anyInt(), anyBoolean())).thenReturn(burntLobsterIcon);
+        when(itemManager.getItemPrice(0)).thenReturn(1);
+        when(itemManager.getItemPrice(2)).thenReturn(100);
     }
 
     @Test
@@ -93,8 +95,8 @@ public class CurrentBankPanelControllerTest {
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Tuesday");
         verify(panel).displayItemListings(eq(list(
-                new ItemListEntry("Coins", 100, coinsIcon),
-                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon))),
+                new ItemListEntry("Coins", 100, coinsIcon, 100, 100),
+                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon, 66600, 6660))),
                 eq(true));
     }
 
@@ -115,8 +117,8 @@ public class CurrentBankPanelControllerTest {
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Monday");
         verify(panel, times(1)).displayItemListings(eq(list(
-                new ItemListEntry("Coins", 100, coinsIcon),
-                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon))),
+                new ItemListEntry("Coins", 100, coinsIcon, 100, 100),
+                new ItemListEntry("Burnt lobster", 666, burntLobsterIcon, 66600, 6660))),
                 eq(true));
 
         currentBankPanelController.handleBankSave(tuesdaySave);
@@ -126,9 +128,10 @@ public class CurrentBankPanelControllerTest {
         verify(panel, times(1)).displayItemListings(any(), anyBoolean());
     }
 
-    private static ItemComposition mockItemComposition(int id, String name) {
+    private static ItemComposition mockItemComposition(String name, int haValue) {
         ItemComposition item = mock(ItemComposition.class);
         when(item.getName()).thenReturn(name);
+        when(item.getHaPrice()).thenReturn(haValue);
         return item;
     }
 

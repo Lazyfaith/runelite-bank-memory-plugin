@@ -36,7 +36,9 @@ public class BankViewPanel extends JPanel {
     private DisplayState state;
 
     private final JLabel syncTimeLabel;
+    private final JPanel northPanel;
     private final IconTextField filterField;
+    private final ValueDisplayPanel valueDisplay;
     private final ItemList itemsList;
     private final JScrollPane itemsScrollPane;
     private final PluginErrorPanel errorPanel;
@@ -46,7 +48,11 @@ public class BankViewPanel extends JPanel {
         setLayout(new BorderLayout(0, PAD));
         setBorder(BorderFactory.createEmptyBorder(PAD, 0, PAD, 0));
 
+        northPanel = new JPanel(new BorderLayout(0, PAD / 2));
+        valueDisplay = new ValueDisplayPanel();
+        northPanel.add(valueDisplay, BorderLayout.NORTH);
         filterField = new IconTextField();
+        northPanel.add(filterField, BorderLayout.SOUTH);
 
         itemsList = new ItemList();
         itemsList.setCellRenderer(new ItemListRenderer());
@@ -109,11 +115,16 @@ public class BankViewPanel extends JPanel {
         ensureDisplayIsInItemListState();
         Point scrollPosition = itemsScrollPane.getViewport().getViewPosition();
 
+        long geValue = 0;
+        long haValue = 0;
         for (int i = 0; i < items.size(); i++) {
             AsyncBufferedImage img = items.get(i).getImage();
             int unfilteredRow = i;
             img.onLoaded(() -> repaintItemEntryIfRowVisible(unfilteredRow));
+            geValue += items.get(i).getGeValue();
+            haValue += items.get(i).getHaValue();
         }
+        valueDisplay.setValues(geValue, haValue);
         FilterableItemListModel listModel = itemsList.getModel();
         listModel.setListContents(items);
 
@@ -123,6 +134,7 @@ public class BankViewPanel extends JPanel {
             itemsScrollPane.getViewport().setViewPosition(new Point(0, 0));
         }
         validate();
+        repaint();
     }
 
     private void ensureDisplayIsInItemListState() {
@@ -130,7 +142,7 @@ public class BankViewPanel extends JPanel {
             return;
         }
         removeAll();
-        add(filterField, BorderLayout.NORTH);
+        add(northPanel, BorderLayout.NORTH);
         add(itemsScrollPane, BorderLayout.CENTER);
         add(syncTimeLabel, BorderLayout.SOUTH);
         state = DisplayState.SHOWING_ITEM_LIST;
@@ -149,6 +161,10 @@ public class BankViewPanel extends JPanel {
 
     void setItemsListRenderer(ListCellRenderer<ItemListEntry> renderer) {
         itemsList.setCellRenderer(renderer);
+    }
+
+    void setStyliseTotalValuesForDiffs(boolean show) {
+        valueDisplay.setStylisedForDiffs(show);
     }
 
     private static class ItemList extends JList<ItemListEntry> {

@@ -46,6 +46,7 @@ public class BankDiffPanel extends JPanel {
         setLayout(new BorderLayout());
         add(itemsList, BorderLayout.CENTER);
         itemsList.setItemsListRenderer(new DiffItemListRenderer());
+        itemsList.setStyliseTotalValuesForDiffs(true);
         itemsList.reset();
 
         JPanel topPanel = new JPanel(new GridBagLayout());

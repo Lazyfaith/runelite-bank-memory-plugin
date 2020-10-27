@@ -14,6 +14,7 @@ import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
+import net.runelite.api.ItemComposition;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
@@ -85,9 +86,11 @@ public class SavedBanksPanelController {
         List<ItemListEntry> items = new ArrayList<>();
 
         for (BankItem i : foundSave.getItemData()) {
-            String name = itemManager.getItemComposition(i.getItemId()).getName();
+            ItemComposition ic = itemManager.getItemComposition(i.getItemId());
             AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
-            items.add(new ItemListEntry(name, i.getQuantity(), icon));
+            int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
+            int haValue = ic.getHaPrice() * i.getQuantity();
+            items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
         }
         SwingUtilities.invokeLater(() -> {
             workingToOpenBank.set(false);
