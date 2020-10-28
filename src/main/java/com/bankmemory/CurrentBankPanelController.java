@@ -51,14 +51,6 @@ public class CurrentBankPanelController {
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
         Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, client.getUsername());
         if (existingSave.isPresent()) {
-            BankSave save = existingSave.get();
-            if (latestDisplayedData != null) {
-                boolean userNameDifferent = latestDisplayedData.getUserName().equalsIgnoreCase(save.getUserName());
-                boolean worldTypeDifferent = latestDisplayedData.getWorldType() != save.getWorldType();
-                if (userNameDifferent || worldTypeDifferent) {
-                    SwingUtilities.invokeLater(panel::reset);
-                }
-            }
             handleBankSave(existingSave.get());
         } else {
             latestDisplayedData = null;
@@ -71,9 +63,10 @@ public class CurrentBankPanelController {
 
         dataStore.saveAsCurrentBank(newSave);
 
-        boolean isDataNew = isItemDataNew(newSave);
+        boolean shouldReset = isBankIdentityDifferentToLastDisplayed(newSave);
+        boolean shouldUpdateItemsDisplay = shouldReset || isItemDataNew(newSave);
         List<ItemListEntry> items = new ArrayList<>();
-        if (isDataNew) {
+        if (shouldUpdateItemsDisplay) {
             // Get all the data we need for the UI on this thread (the game thread)
             // Doing it on the EDT seems to cause random crashes & NPEs
             for (BankItem i : newSave.getItemData()) {
@@ -85,12 +78,24 @@ public class CurrentBankPanelController {
             }
         }
         SwingUtilities.invokeLater(() -> {
+            if (shouldReset) {
+                panel.reset();
+            }
             panel.updateTimeDisplay(newSave.getDateTimeString());
-            if (isDataNew) {
+            if (shouldUpdateItemsDisplay) {
                 panel.displayItemListings(items, true);
             }
         });
         latestDisplayedData = newSave;
+    }
+
+    private boolean isBankIdentityDifferentToLastDisplayed(BankSave newSave) {
+        if (latestDisplayedData == null) {
+            return true;
+        }
+        boolean userNamesSame = latestDisplayedData.getUserName().equalsIgnoreCase(newSave.getUserName());
+        boolean worldTypesSame = latestDisplayedData.getWorldType() == newSave.getWorldType();
+        return !userNamesSame || !worldTypesSame;
     }
 
     private boolean isItemDataNew(BankSave newSave) {
