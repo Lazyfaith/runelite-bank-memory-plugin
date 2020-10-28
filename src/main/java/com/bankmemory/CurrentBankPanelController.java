@@ -2,6 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
+import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,12 +48,16 @@ public class CurrentBankPanelController {
     }
 
     private void updateDisplayForCurrentAccount() {
-        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(client.getUsername());
+        BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
+        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, client.getUsername());
         if (existingSave.isPresent()) {
             BankSave save = existingSave.get();
-            if (latestDisplayedData != null
-                    && !latestDisplayedData.getUserName().equalsIgnoreCase(save.getUserName())) {
-                SwingUtilities.invokeLater(panel::reset);
+            if (latestDisplayedData != null) {
+                boolean userNameDifferent = latestDisplayedData.getUserName().equalsIgnoreCase(save.getUserName());
+                boolean worldTypeDifferent = latestDisplayedData.getWorldType() != save.getWorldType();
+                if (userNameDifferent || worldTypeDifferent) {
+                    SwingUtilities.invokeLater(panel::reset);
+                }
             }
             handleBankSave(existingSave.get());
         } else {

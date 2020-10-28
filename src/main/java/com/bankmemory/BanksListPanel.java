@@ -1,10 +1,10 @@
 package com.bankmemory;
 
+import com.bankmemory.data.BankWorldType;
 import com.bankmemory.util.Constants;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.MouseInfo;
@@ -23,6 +23,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.SwingUtilities;
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.components.PluginErrorPanel;
 
 
@@ -160,9 +161,13 @@ public class BanksListPanel extends JPanel {
             add(new JLabel(entry.getSaveName()), c);
 
             c.gridy = 1;
-            JLabel subText = new JLabel(entry.getAccountDisplayName());
-            subText.setFont(subText.getFont().deriveFont(Font.ITALIC));
-            add(subText, c);
+            String subText = entry.getAccountDisplayName();
+            if (entry.getWorldType() != BankWorldType.DEFAULT) {
+                subText += " (" + entry.getWorldType().getDisplayString() + ")";
+            }
+            JLabel subLabel = new JLabel(subText);
+            subLabel.setFont(FontManager.getRunescapeSmallFont());
+            add(subLabel, c);
 
             addMouseListener(mouseListener);
         }

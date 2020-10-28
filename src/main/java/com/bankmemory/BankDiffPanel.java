@@ -1,5 +1,8 @@
 package com.bankmemory;
 
+import com.bankmemory.data.BankWorldType;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -19,6 +22,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import net.runelite.client.ui.ColorScheme;
+import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.components.ComboBoxListRenderer;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.SwingUtil;
@@ -32,8 +36,8 @@ public class BankDiffPanel extends JPanel {
 
     private static final Icon REVERSE_ICON;
     private static final Icon REVERSE_ICON_HOVER;
-    private static final String CURRENT_BANKS = "Current banks";
-    private static final String SNAPSHOT_BANKS = "Snapshots";
+    private static final String CURRENT_BANKS = "- Current banks -";
+    private static final String SNAPSHOT_BANKS = "- Snapshots -";
 
     private final BankViewPanel itemsList = new BankViewPanel();
     private final OptionsListModel beforeOptionsModel = new OptionsListModel();
@@ -114,11 +118,11 @@ public class BankDiffPanel extends JPanel {
         List<Object> options = new ArrayList<>();
         if (!currentBanks.isEmpty()) {
             options.add(CURRENT_BANKS);
-            options.addAll(currentBanks);
+            options.addAll(listWithWorldSeparators(currentBanks));
         }
         if (!snapshotBanks.isEmpty()) {
             options.add(SNAPSHOT_BANKS);
-            options.addAll(snapshotBanks);
+            options.addAll(listWithWorldSeparators(snapshotBanks));
         }
         disableSelectionListener = true;
         beforeOptionsModel.removeAllElements();
@@ -128,6 +132,21 @@ public class BankDiffPanel extends JPanel {
             afterOptionsModel.addElement(o);
         });
         disableSelectionListener = false;
+    }
+
+    private List<Object> listWithWorldSeparators(List<BankDiffListOption> options) {
+        ListMultimap<BankWorldType, BankDiffListOption> optionsByWorldType = ArrayListMultimap.create();
+        options.forEach(o -> optionsByWorldType.put(o.getSave().getWorldType(), o));
+        List<Object> resultList = new ArrayList<>();
+        for (BankWorldType type : BankWorldType.values()) {
+            if (optionsByWorldType.containsKey(type)) {
+                if (type != BankWorldType.DEFAULT) {
+                    resultList.add(type.getDisplayString());
+                }
+                resultList.addAll(optionsByWorldType.get(type));
+            }
+        }
+        return resultList;
     }
 
     void setSelections(BankDiffListOption before, BankDiffListOption after) {
@@ -181,13 +200,17 @@ public class BankDiffPanel extends JPanel {
 
             Component comp = wrapped.getListCellRendererComponent(list, valToRender, index, isSelected, cellHasFocus);
 
-            int fontStyle = Font.PLAIN;
+            Font font = FontManager.getRunescapeFont();
             Color fgColour = comp.getForeground();
             if (!(value instanceof BankDiffListOption)) {
-                fontStyle = Font.BOLD;
+                if (value == CURRENT_BANKS || value == SNAPSHOT_BANKS) {
+                    font = FontManager.getRunescapeBoldFont();
+                } else {
+                    font = FontManager.getRunescapeSmallFont().deriveFont(Font.ITALIC);
+                }
                 fgColour = ColorScheme.BRAND_ORANGE;
             }
-            comp.setFont(comp.getFont().deriveFont(fontStyle));
+            comp.setFont(font);
             comp.setForeground(fgColour);
             return comp;
         }

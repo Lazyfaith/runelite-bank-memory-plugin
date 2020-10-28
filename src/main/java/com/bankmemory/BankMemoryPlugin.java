@@ -1,6 +1,7 @@
 package com.bankmemory;
 
 import com.bankmemory.data.BankSave;
+import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;
 import com.bankmemory.util.Constants;
 import java.awt.image.BufferedImage;
@@ -106,7 +107,9 @@ public class BankMemoryPlugin extends Plugin {
         if (event.getContainerId() != InventoryID.BANK.getId()) {
             return;
         }
+        BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
         ItemContainer bank = event.getItemContainer();
-        currentBankPanelController.handleBankSave(BankSave.fromCurrentBank(client.getUsername(), bank, itemManager));
+        currentBankPanelController.handleBankSave(
+                BankSave.fromCurrentBank(worldType, client.getUsername(), bank, itemManager));
     }
 }

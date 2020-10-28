@@ -2,6 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
+import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -9,12 +10,14 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.testing.fieldbinder.Bind;
 import com.google.inject.testing.fieldbinder.BoundFieldModule;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ItemComposition;
+import net.runelite.api.WorldType;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
 import org.junit.Before;
@@ -50,6 +53,7 @@ public class CurrentBankPanelControllerTest {
     public void before() {
         Guice.createInjector(BoundFieldModule.of(this)).injectMembers(this);
         when(client.isClientThread()).thenReturn(true);
+        when(client.getWorldType()).thenReturn(EnumSet.of(WorldType.MEMBERS));
         ItemComposition coins = mockItemComposition("Coins", 1);
         ItemComposition burntLobster = mockItemComposition("Burnt lobster", 10);
         when(itemManager.getItemComposition(0)).thenReturn(coins);
@@ -74,7 +78,7 @@ public class CurrentBankPanelControllerTest {
     public void testStartup_ifLoggedInButNoDataForAccount_displayNoData() throws Exception {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getUsername()).thenReturn("MrSam");
-        when(dataStore.getDataForCurrentBank("MrSam")).thenReturn(Optional.empty());
+        when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, "MrSam")).thenReturn(Optional.empty());
 
         currentBankPanelController.startUp(panel);
 
@@ -86,8 +90,8 @@ public class CurrentBankPanelControllerTest {
     public void testStartup_ifLoggedInAndDataAvailable_displayAccountData() throws Exception {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getUsername()).thenReturn("MrSam");
-        when(dataStore.getDataForCurrentBank("MrSam")).thenReturn(Optional.of(
-                new BankSave("MrSam", "My Bank", "Tuesday",
+        when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, "MrSam")).thenReturn(Optional.of(
+                new BankSave(BankWorldType.DEFAULT, "MrSam", "My Bank", "Tuesday",
                         ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)))));
 
         currentBankPanelController.startUp(panel);
@@ -104,9 +108,9 @@ public class CurrentBankPanelControllerTest {
     public void testHandleBankSave_ifItemDataHasNotChangedThenOnlyUpdateTime() throws Exception {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getUsername()).thenReturn("MrSam");
-        BankSave mondaySave = new BankSave("MrSam", "My Bank", "Monday",
+        BankSave mondaySave = new BankSave(BankWorldType.DEFAULT, "MrSam", "My Bank", "Monday",
                 ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)));
-        BankSave tuesdaySave = new BankSave("MrSam", "My Bank", "Tuesday", mondaySave.getItemData());
+        BankSave tuesdaySave = new BankSave(BankWorldType.DEFAULT, "MrSam", "My Bank", "Tuesday", mondaySave.getItemData());
         currentBankPanelController.startUp(panel);
 
         verify(panel, never()).updateTimeDisplay(any());

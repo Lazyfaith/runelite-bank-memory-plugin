@@ -20,6 +20,7 @@ public class BankSave {
     private static final AtomicInteger idIncrementer = new AtomicInteger();
 
     long id;
+    BankWorldType worldType;
     String dateTimeString;
     String userName;
     @Nullable String saveName;
@@ -27,18 +28,29 @@ public class BankSave {
 
     @VisibleForTesting
     public BankSave(
+            BankWorldType worldType,
             String userName,
             @Nullable String saveName,
             String dateTimeString,
             ImmutableList<BankItem> itemData) {
         id = ID_BASE + idIncrementer.incrementAndGet();
+        this.worldType = worldType;
         this.userName = userName;
         this.saveName = saveName;
         this.dateTimeString = dateTimeString;
         this.itemData = itemData;
     }
 
-    public static BankSave fromCurrentBank(String userName, ItemContainer bank, ItemManager itemManager) {
+    // TODO: when I create a proper data upgrader/transitioner thing, remove this and put relevant logic there
+    public BankWorldType getWorldType() {
+        return worldType == null ? BankWorldType.DEFAULT : worldType;
+    }
+
+    public static BankSave fromCurrentBank(
+            BankWorldType worldType,
+            String userName,
+            ItemContainer bank,
+            ItemManager itemManager) {
         Objects.requireNonNull(bank);
         net.runelite.api.Item[] contents = bank.getItems();
         ImmutableList.Builder<BankItem> itemData = ImmutableList.builder();
@@ -54,12 +66,17 @@ public class BankSave {
             itemData.add(new BankItem(canonId, item.getQuantity()));
         }
         String timeString = DATE_FORMATTER.format(ZonedDateTime.now());
-        return new BankSave(userName, null, timeString, itemData.build());
+        return new BankSave(worldType, userName, null, timeString, itemData.build());
     }
 
     public static BankSave snapshotFromExistingBank(String newName, BankSave existingBank) {
         Objects.requireNonNull(newName);
-        return new BankSave(existingBank.userName, newName, existingBank.dateTimeString, existingBank.itemData);
+        return new BankSave(
+                existingBank.worldType,
+                existingBank.userName,
+                newName,
+                existingBank.dateTimeString,
+                existingBank.itemData);
     }
 
     @Override
