@@ -16,6 +16,8 @@ A plugin for [RuneLite](https://github.com/runelite/runelite) which remembers th
 
 ## Version history
 
+- v1.1.1
+  - Bug fix - Stop current bank panel sometimes being reset and left blank
 - v1.1
   - Separate current bank saves for regular worlds, League worlds, Tournament (Unrestricted) worlds, and Deadman Mode worlds.
   - Display total Grand Exchange value and High Alch value of bank saves (and the difference when comparing 2 banks saves)
