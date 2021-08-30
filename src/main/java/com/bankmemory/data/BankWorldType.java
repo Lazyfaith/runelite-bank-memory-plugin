@@ -17,14 +17,14 @@ public enum BankWorldType {
 
     String displayString;
 
-    public static BankWorldType forWorld(EnumSet<WorldType> worldsTypes) {
-        if (worldsTypes.contains(WorldType.SEASONAL)) {
-            return BankWorldType.LEAGUE;
+    public static BankWorldType forWorld(EnumSet<WorldType> worldTypes) {
+        if (worldTypes.contains(WorldType.SEASONAL)) {
+            return worldTypes.contains(WorldType.DEADMAN) ? BankWorldType.DEADMAN_TOURNAMENT : BankWorldType.LEAGUE;
         }
-        if (worldsTypes.contains(WorldType.TOURNAMENT_WORLD)) {
+        if (worldTypes.contains(WorldType.TOURNAMENT_WORLD)) {
             return BankWorldType.TOURNAMENT;
         }
-        if (worldsTypes.contains(WorldType.DEADMAN)) {
+        if (worldTypes.contains(WorldType.DEADMAN)) {
             return BankWorldType.DEADMAN;
         }
         return BankWorldType.DEFAULT;
