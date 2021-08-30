@@ -25,9 +25,6 @@ public enum BankWorldType {
             return BankWorldType.TOURNAMENT;
         }
         if (worldsTypes.contains(WorldType.DEADMAN)) {
-            return BankWorldType.DEADMAN_TOURNAMENT;
-        }
-        if (worldsTypes.contains(WorldType.DEADMAN)) {
             return BankWorldType.DEADMAN;
         }
         return BankWorldType.DEFAULT;
