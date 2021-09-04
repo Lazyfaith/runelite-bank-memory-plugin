@@ -16,6 +16,8 @@ A plugin for [RuneLite](https://github.com/runelite/runelite) which remembers th
 
 ## Version history
 
+- v1.1.2
+  - Updated to work with new RuneLite APIs (thank you, Septem151) 
 - v1.1.1
   - Bug fix - Stop current bank panel sometimes being reset and left blank
 - v1.1
