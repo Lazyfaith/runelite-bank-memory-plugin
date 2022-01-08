@@ -23,9 +23,9 @@ dependencies {
         exclude group: 'ch.qos.logback', module: 'logback-classic'
     }
 
-    testCompile group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
-    testCompile group: 'com.google.inject.extensions', name: 'guice-testlib', version: '4.1.0'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '2.2'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '3.2.4'
+    testImplementation group: 'com.google.inject.extensions', name: 'guice-testlib', version: '4.1.0'
 }
 
 group = 'com.bankmemory'
