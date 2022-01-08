@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import lombok.Value;
 import net.runelite.api.ItemContainer;
+import net.runelite.api.ItemID;
 import net.runelite.client.game.ItemManager;
 
 @Value
@@ -74,7 +75,7 @@ public class BankSave {
     }
 
     private static boolean isItemToClean(int itemId) {
-        return itemId == NULL_ITEM_ID;
+        return itemId == NULL_ITEM_ID || itemId == ItemID.BANK_FILLER;
     }
 
     public static BankSave snapshotFromExistingBank(String newName, BankSave existingBank) {
