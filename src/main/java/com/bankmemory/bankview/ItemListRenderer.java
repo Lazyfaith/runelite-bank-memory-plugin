@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.bankview;
 
 import java.awt.Component;
 import javax.swing.ImageIcon;
@@ -6,7 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
-public class ItemListRenderer extends JLabel implements ListCellRenderer<ItemListEntry> {
+class ItemListRenderer extends JLabel implements ListCellRenderer<ItemListEntry> {
     @Override
     public Component getListCellRendererComponent(JList<? extends ItemListEntry> list,
                                                   ItemListEntry value,

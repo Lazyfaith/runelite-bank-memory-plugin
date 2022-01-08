@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.bankview;
 
 import java.awt.Color;
 import java.awt.Dimension;

@@ -1,5 +1,6 @@
 package com.bankmemory;
 
+import com.bankmemory.bankview.ItemListEntry;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Font;

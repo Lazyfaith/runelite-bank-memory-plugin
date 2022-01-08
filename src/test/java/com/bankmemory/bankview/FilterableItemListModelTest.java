@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.bankview;
 
 import com.google.common.collect.Lists;
 import java.awt.image.BufferedImage;

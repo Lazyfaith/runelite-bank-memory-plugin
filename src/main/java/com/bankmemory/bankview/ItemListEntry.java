@@ -1,10 +1,10 @@
-package com.bankmemory;
+package com.bankmemory.bankview;
 
 import lombok.Value;
 import net.runelite.client.util.AsyncBufferedImage;
 
 @Value
-class ItemListEntry {
+public class ItemListEntry {
     String itemName;
     int quantity;
     AsyncBufferedImage image;

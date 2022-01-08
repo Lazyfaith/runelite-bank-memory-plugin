@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.bankview;
 
 import junit.framework.TestCase;
 import org.junit.Test;

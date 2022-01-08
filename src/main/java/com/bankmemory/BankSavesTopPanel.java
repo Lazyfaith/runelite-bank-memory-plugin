@@ -1,5 +1,7 @@
 package com.bankmemory;
 
+import com.bankmemory.bankview.BankViewPanel;
+import com.bankmemory.bankview.ItemListEntry;
 import java.awt.BorderLayout;
 import java.awt.image.BufferedImage;
 import java.util.List;

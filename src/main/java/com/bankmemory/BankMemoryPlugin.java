@@ -1,5 +1,6 @@
 package com.bankmemory;
 
+import com.bankmemory.bankview.BankViewPanel;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;

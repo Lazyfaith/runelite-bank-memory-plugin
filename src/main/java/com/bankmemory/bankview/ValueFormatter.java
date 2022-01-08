@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.bankview;
 
 import java.math.RoundingMode;
 import java.text.DecimalFormat;

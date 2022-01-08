@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.bankview;
 
 import com.bankmemory.util.Constants;
 import com.bankmemory.util.OnAnyChangeDocumentListener;
@@ -44,7 +44,7 @@ public class BankViewPanel extends JPanel {
     private final JScrollPane itemsScrollPane;
     private final PluginErrorPanel errorPanel;
 
-    protected BankViewPanel() {
+    public BankViewPanel() {
         super(false);
         setLayout(new BorderLayout(0, PAD));
         setBorder(BorderFactory.createEmptyBorder(PAD, 0, PAD, 0));
@@ -80,7 +80,7 @@ public class BankViewPanel extends JPanel {
         displayNoDataMessage();
     }
 
-    void displayNoDataMessage() {
+    public void displayNoDataMessage() {
         checkState(SwingUtilities.isEventDispatchThread());
         reset();
         add(errorPanel, BorderLayout.NORTH);
@@ -92,7 +92,7 @@ public class BankViewPanel extends JPanel {
      * Resets filter, resets list data, resets scroll position and removes UI components.
      * Indirectly: releases some held objects (by resetting the list).
      */
-    void reset() {
+    public void reset() {
         checkState(SwingUtilities.isEventDispatchThread());
         itemsList.getModel().clearList();
         itemsList.getModel().clearFilter();
@@ -106,12 +106,12 @@ public class BankViewPanel extends JPanel {
         itemsScrollPane.getViewport().setViewPosition(new Point(0, 0));
     }
 
-    void updateTimeDisplay(String timeString) {
+    public void updateTimeDisplay(String timeString) {
         checkState(SwingUtilities.isEventDispatchThread());
         syncTimeLabel.setText("Data from: " + timeString);
     }
 
-    void displayItemListings(List<ItemListEntry> items, boolean preserveScrollPos) {
+    public void displayItemListings(List<ItemListEntry> items, boolean preserveScrollPos) {
         checkState(SwingUtilities.isEventDispatchThread());
 
         ensureDisplayIsInItemListState();
@@ -161,11 +161,11 @@ public class BankViewPanel extends JPanel {
         }
     }
 
-    void setItemsListRenderer(ListCellRenderer<ItemListEntry> renderer) {
+    public void setItemsListRenderer(ListCellRenderer<ItemListEntry> renderer) {
         itemsList.setCellRenderer(renderer);
     }
 
-    void setStyliseTotalValuesForDiffs(boolean show) {
+    public void setStyliseTotalValuesForDiffs(boolean show) {
         valueDisplay.setStylisedForDiffs(show);
     }
 

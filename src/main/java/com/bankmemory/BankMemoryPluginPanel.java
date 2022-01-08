@@ -1,5 +1,6 @@
 package com.bankmemory;
 
+import com.bankmemory.bankview.BankViewPanel;
 import java.awt.BorderLayout;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;

@@ -1,5 +1,7 @@
 package com.bankmemory;
 
+import com.bankmemory.bankview.BankViewPanel;
+import com.bankmemory.bankview.ItemListEntry;
 import com.bankmemory.data.BankWorldType;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;

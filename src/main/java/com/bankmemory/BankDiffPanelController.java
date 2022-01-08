@@ -1,6 +1,7 @@
 package com.bankmemory;
 
 import com.bankmemory.BankDiffListOption.Type;
+import com.bankmemory.bankview.ItemListEntry;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.DataStoreUpdateListener;

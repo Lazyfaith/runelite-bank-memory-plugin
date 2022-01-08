@@ -1,4 +1,4 @@
-package com.bankmemory;
+package com.bankmemory.bankview;
 
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -10,7 +10,7 @@ import javax.swing.event.ListDataListener;
 
 import static com.google.common.base.Preconditions.checkElementIndex;
 
-public class FilterableItemListModel implements ListModel<ItemListEntry> {
+class FilterableItemListModel implements ListModel<ItemListEntry> {
 
     private List<ItemListEntry> rawListContents = new ArrayList<>();
     private String lcFilterString = "";
