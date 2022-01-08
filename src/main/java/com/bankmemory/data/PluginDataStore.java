@@ -18,6 +18,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,7 +55,8 @@ public class PluginDataStore {
 
     private List<BankSave> loadCurrentBankList() {
         Type deserialiseType = new TypeToken<List<BankSave>>(){}.getType();
-        return loadDataFromConfig(CURRENT_LIST_KEY, deserialiseType, new ArrayList<>(), "Current bank list");
+        List<BankSave> fromDataStore = loadDataFromConfig(CURRENT_LIST_KEY, deserialiseType, new ArrayList<>(), "Current bank list");
+        return upgradeBankSaves(fromDataStore);
     }
 
     private <T> T loadDataFromConfig(String configKey, Type deserialiseType, T defaultInstance, String dataName) {
@@ -75,9 +77,16 @@ public class PluginDataStore {
         }
     }
 
+    private List<BankSave> upgradeBankSaves(List<BankSave> bankSaves) {
+        return bankSaves.stream()
+                .map(BankSave::cleanItemData)
+                .collect(Collectors.toList());
+    }
+
     private List<BankSave> loadSnapshotBanksList() {
         Type deserialiseType = new TypeToken<List<BankSave>>(){}.getType();
-        return loadDataFromConfig(SNAPSHOT_LIST_KEY, deserialiseType, new ArrayList<>(), "Snapshot bank list");
+        List<BankSave> fromDataStore =  loadDataFromConfig(SNAPSHOT_LIST_KEY, deserialiseType, new ArrayList<>(), "Snapshot bank list");
+        return upgradeBankSaves(fromDataStore);
     }
 
     private Gson buildGson() {

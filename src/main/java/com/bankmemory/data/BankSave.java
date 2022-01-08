@@ -19,6 +19,8 @@ public class BankSave {
     private static final long ID_BASE = System.currentTimeMillis();
     private static final AtomicInteger idIncrementer = new AtomicInteger();
 
+    private static final int NULL_ITEM_ID = -1;
+
     long id;
     BankWorldType worldType;
     String dateTimeString;
@@ -61,12 +63,18 @@ public class BankSave {
             if (idInBank != canonId) {
                 // It's just a placeholder
                 continue;
+            } else if (isItemToClean(idInBank)) {
+                continue;
             }
 
             itemData.add(new BankItem(canonId, item.getQuantity()));
         }
         String timeString = DATE_FORMATTER.format(ZonedDateTime.now());
         return new BankSave(worldType, userName, null, timeString, itemData.build());
+    }
+
+    private static boolean isItemToClean(int itemId) {
+        return itemId == NULL_ITEM_ID;
     }
 
     public static BankSave snapshotFromExistingBank(String newName, BankSave existingBank) {
@@ -77,6 +85,21 @@ public class BankSave {
                 newName,
                 existingBank.dateTimeString,
                 existingBank.itemData);
+    }
+
+    public static BankSave cleanItemData(BankSave existingBank) {
+        Objects.requireNonNull(existingBank);
+
+        ImmutableList<BankItem> cleanItemData = existingBank.itemData.stream()
+                .filter(i -> !isItemToClean(i.getItemId()))
+                .collect(ImmutableList.toImmutableList());
+
+        return new BankSave(
+                existingBank.worldType,
+                existingBank.userName,
+                existingBank.saveName,
+                existingBank.dateTimeString,
+                cleanItemData);
     }
 
     @Override
