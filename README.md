@@ -10,12 +10,17 @@ A plugin for [RuneLite](https://github.com/runelite/runelite) which remembers th
 - View any of your bank saves at any time
 - Quickly search the contents of your banks
 - Compare two banks saves to see the difference in items and value
+- Easily export item data
 
 **NB**: You must log in to an account and open the bank for the plugin to be able to actually get the data.
 
 
 ## Version history
 
+- v1.2.0
+  - Add ability to export bank item data in TSV format (Hint: right click to open context menu)
+  - Filter out null items from item lists
+  - Filter out bank filler from item lists
 - v1.1.2
   - Updated to work with new RuneLite APIs (thank you, Septem151) 
 - v1.1.1
