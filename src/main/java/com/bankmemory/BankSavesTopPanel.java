@@ -70,6 +70,10 @@ public class BankSavesTopPanel extends JPanel {
         repaint();
     }
 
+    public BankViewPanel getBankViewPanel() {
+        return bankViewPanel;
+    }
+
     public BankDiffPanel getDiffPanel() {
         return bankDiffPanel;
     }

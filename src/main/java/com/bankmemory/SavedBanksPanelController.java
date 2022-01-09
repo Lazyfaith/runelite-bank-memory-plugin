@@ -6,10 +6,12 @@ import com.bankmemory.data.BankSave;
 import com.bankmemory.data.DataStoreUpdateListener;
 import com.bankmemory.data.DisplayNameMapper;
 import com.bankmemory.data.PluginDataStore;
+import com.bankmemory.util.ClipboardActions;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
@@ -33,6 +35,7 @@ public class SavedBanksPanelController {
     private ImageIcon notedCasketIcon;
     private final AtomicBoolean workingToOpenBank = new AtomicBoolean();
     private DataStoreListener dataStoreListener;
+    @Nullable BankSave bankForClipboardAction;
 
     public void startUp(BankSavesTopPanel topPanel) {
         assert SwingUtilities.isEventDispatchThread();
@@ -44,6 +47,8 @@ public class SavedBanksPanelController {
 
         topPanel.displayBanksListPanel();
         updateCurrentBanksList();
+
+        setPopupMenuActionOnBankView();
 
         dataStoreListener = new DataStoreListener();
         dataStore.addListener(dataStoreListener);
@@ -73,6 +78,19 @@ public class SavedBanksPanelController {
         }
     }
 
+    private void setPopupMenuActionOnBankView() {
+        topPanel.getBankViewPanel().setItemListPopupMenuAction(new CopyItemsToClipboardAction(clientThread, itemManager) {
+            @Nullable
+            @Override
+            public BankSave getBankItemData() {
+                if (bankForClipboardAction == null) {
+                    log.error("Tried to copy CSV data to clipboard before any bank save has been opened");
+                }
+                return bankForClipboardAction;
+            }
+        });
+    }
+
     private void openSavedBank(BanksListEntry selected) {
         assert client.isClientThread();
 
@@ -95,6 +113,7 @@ public class SavedBanksPanelController {
         }
         SwingUtilities.invokeLater(() -> {
             workingToOpenBank.set(false);
+            bankForClipboardAction = foundSave;
             topPanel.displaySavedBankData(selected.getSaveName(), items, foundSave.getDateTimeString());
         });
     }
@@ -125,6 +144,16 @@ public class SavedBanksPanelController {
                 dataStore.saveAsSnapshotBank(saveName, existingSave.get());
             } else {
                 log.error("Tried to 'Save As' missing bank save: {}", save);
+            }
+        }
+
+        @Override
+        public void copyBankSaveItemDataToClipboard(BanksListEntry save) {
+            Optional<BankSave> existingSave = dataStore.getBankSaveWithId(save.getSaveId());
+            if (existingSave.isPresent()) {
+                ClipboardActions.copyItemDataAsTsvToClipboardOnClientThread(clientThread, itemManager, existingSave.get().getItemData());
+            } else {
+                log.error("Tried to copy CSV data to clipboard for missing bank save: {}", save);
             }
         }
 

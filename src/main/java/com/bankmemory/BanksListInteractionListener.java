@@ -7,5 +7,7 @@ public interface BanksListInteractionListener {
 
     void saveBankAs(BanksListEntry save, String saveName);
 
+    void copyBankSaveItemDataToClipboard(BanksListEntry save);
+
     void openBanksDiffPanel();
 }

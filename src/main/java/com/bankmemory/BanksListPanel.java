@@ -64,6 +64,7 @@ public class BanksListPanel extends JPanel {
     private JPopupMenu createContextMenu() {
         JPopupMenu menu = new JPopupMenu();
         menu.add(createMenuSaveAsAction(menu));
+        menu.add(createMenuCopyItemDataToClipboardAction(menu));
         menu.add(createMenuDeleteAction(menu));
         return menu;
     }
@@ -84,6 +85,16 @@ public class BanksListPanel extends JPanel {
 
                 BanksListEntry save = ((EntryPanel) menu.getInvoker()).entry;
                 interactionListener.saveBankAs(save, inputName);
+            }
+        };
+    }
+
+    private Action createMenuCopyItemDataToClipboardAction(JPopupMenu menu) {
+        return new AbstractAction(Constants.ACTION_COPY_ITEM_DATA_TO_CLIPBOARD) {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BanksListEntry save = ((EntryPanel) menu.getInvoker()).entry;
+                interactionListener.copyBankSaveItemDataToClipboard(save);
             }
         };
     }

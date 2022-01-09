@@ -6,10 +6,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.util.List;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListModel;
@@ -167,6 +169,12 @@ public class BankViewPanel extends JPanel {
 
     public void setStyliseTotalValuesForDiffs(boolean show) {
         valueDisplay.setStylisedForDiffs(show);
+    }
+
+    public void setItemListPopupMenuAction(Action action) {
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(action);
+        itemsList.setComponentPopupMenu(menu);
     }
 
     private static class ItemList extends JList<ItemListEntry> {

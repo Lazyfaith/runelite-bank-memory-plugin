@@ -12,15 +12,19 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
+import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.ItemComposition;
 import net.runelite.api.events.GameStateChanged;
+import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.util.AsyncBufferedImage;
 
+@Slf4j
 public class CurrentBankPanelController {
     @Inject private Client client;
+    @Inject private ClientThread clientThread;
     @Inject private ItemManager itemManager;
     @Inject private PluginDataStore dataStore;
 
@@ -32,12 +36,26 @@ public class CurrentBankPanelController {
         assert client.isClientThread();
 
         this.panel = panel;
+        SwingUtilities.invokeLater(this::setPopupMenuActionOnBankView);
 
         if (client.getGameState() == GameState.LOGGED_IN) {
             updateDisplayForCurrentAccount();
         } else {
             SwingUtilities.invokeLater(panel::displayNoDataMessage);
         }
+    }
+
+    private void setPopupMenuActionOnBankView() {
+        this.panel.setItemListPopupMenuAction(new CopyItemsToClipboardAction(clientThread, itemManager) {
+            @Nullable
+            @Override
+            public BankSave getBankItemData() {
+                if (latestDisplayedData == null) {
+                    log.error("Tried to copy CSV data to clipboard before any current bank shown");
+                }
+                return latestDisplayedData;
+            }
+        });
     }
 
     public void onGameStateChanged(GameStateChanged gameStateChanged) {
