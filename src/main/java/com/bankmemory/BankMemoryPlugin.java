@@ -8,6 +8,8 @@ import com.bankmemory.util.Constants;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
+
+import com.google.inject.Provides;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
@@ -17,12 +19,16 @@ import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.callback.ClientThread;
+import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
+import net.runelite.client.ui.overlay.OverlayManager;
+import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 import net.runelite.client.util.ImageUtil;
 
 @PluginDescriptor(
@@ -32,18 +38,30 @@ import net.runelite.client.util.ImageUtil;
 public class BankMemoryPlugin extends Plugin {
     private static final String ICON = "bank_memory_icon.png";
 
+    public static final String CONFIG_GROUP = "bankmemory";
+
     @Inject private ClientToolbar clientToolbar;
     @Inject private Client client;
     @Inject private ClientThread clientThread;
     @Inject private ItemManager itemManager;
     @Inject private PluginDataStore dataStore;
 
+    @Inject private BankMemoryConfig config;
+
+    @Inject private BankMemoryItemOverlay itemOverlay;
+
+    @Inject private OverlayManager overlayManager;
+
     private CurrentBankPanelController currentBankPanelController;
     private SavedBanksPanelController savedBanksPanelController;
     private BankDiffPanelController diffPanelController;
-
     private NavigationButton navButton;
     private boolean displayNameRegistered = false;
+
+    @Provides
+    BankMemoryConfig provideConfig(ConfigManager configManager) {
+        return configManager.getConfig(BankMemoryConfig.class);
+    }
 
     @Override
     protected void startUp() throws Exception {
@@ -71,6 +89,10 @@ public class BankMemoryPlugin extends Plugin {
         savedBanksPanelController.startUp(pluginPanel.getSavedBanksTopPanel());
         diffPanelController = injector.getInstance(BankDiffPanelController.class);
         diffPanelController.startUp(pluginPanel.getSavedBanksTopPanel().getDiffPanel());
+
+        if (config.showTooltips()) {
+            overlayManager.add(itemOverlay);
+        }
     }
 
     @Override
@@ -81,6 +103,7 @@ public class BankMemoryPlugin extends Plugin {
         currentBankPanelController = null;
         savedBanksPanelController = null;
         diffPanelController = null;
+        overlayManager.remove(itemOverlay);
     }
 
     @Subscribe
@@ -89,6 +112,7 @@ public class BankMemoryPlugin extends Plugin {
         if (gameStateChanged.getGameState() != GameState.LOGGED_IN) {
             displayNameRegistered = false;
         }
+
     }
 
     @Subscribe
