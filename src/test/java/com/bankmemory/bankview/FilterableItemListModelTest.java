@@ -4,8 +4,11 @@ import com.google.common.collect.Lists;
 import java.awt.image.BufferedImage;
 import java.util.List;
 import javax.swing.event.ListDataListener;
+import com.google.inject.testing.fieldbinder.*;
+import net.runelite.client.callback.*;
 import net.runelite.client.util.AsyncBufferedImage;
 import org.junit.Test;
+import org.mockito.*;
 
 
 import static org.hamcrest.CoreMatchers.is;
@@ -29,6 +32,10 @@ public class FilterableItemListModelTest {
     private static final ItemListEntry amuletOfGlory = item("Amulet of Glory");
     private static final ItemListEntry antiDragonShield = item("Anti-dragon shield");
     private static final ItemListEntry petKitten = item("Pet kitten");
+
+    @Mock
+    @Bind
+    private static ClientThread clientThread;
 
     @Test
     public void testGetElementAt_givenNoFilter() {
@@ -199,7 +206,7 @@ public class FilterableItemListModelTest {
     }
 
     private static ItemListEntry item(String name) {
-        return new ItemListEntry(name, 1, new AsyncBufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), 1, 1);
+        return new ItemListEntry(name, 1, new AsyncBufferedImage(clientThread, 1, 1, BufferedImage.TYPE_INT_ARGB), 1, 1);
     }
 
     private static List<ItemListEntry> list(ItemListEntry... items) {

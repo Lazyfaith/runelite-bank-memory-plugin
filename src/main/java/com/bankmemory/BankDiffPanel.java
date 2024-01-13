@@ -25,7 +25,7 @@ import javax.swing.JPanel;
 import javax.swing.ListCellRenderer;
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
-import net.runelite.client.ui.components.ComboBoxListRenderer;
+import net.runelite.client.ui.components.TitleCaseListCellRenderer;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.SwingUtil;
 
@@ -186,7 +186,7 @@ public class BankDiffPanel extends JPanel {
     }
 
     private static class OptionsListRenderer implements ListCellRenderer<Object> {
-        private final ComboBoxListRenderer wrapped = new ComboBoxListRenderer();
+        private final TitleCaseListCellRenderer wrapped = new TitleCaseListCellRenderer();
 
         @Override
         public Component getListCellRendererComponent(
