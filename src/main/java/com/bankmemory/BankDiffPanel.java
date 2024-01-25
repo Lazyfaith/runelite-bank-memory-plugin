@@ -1,37 +1,27 @@
 package com.bankmemory;
 
-import com.bankmemory.bankview.BankViewPanel;
-import com.bankmemory.bankview.ItemListEntry;
-import com.bankmemory.data.BankWorldType;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ListMultimap;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
+
+import javax.swing.*;
+
+import com.bankmemory.bankview.BankViewPanel;
+import com.bankmemory.bankview.ItemListEntry;
+import com.bankmemory.data.BankWorldType;
+import com.bankmemory.ui.ComboBoxListRenderer;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ListMultimap;
+
 import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
-import net.runelite.client.ui.components.ComboBoxListRenderer;
 import net.runelite.client.util.ImageUtil;
 import net.runelite.client.util.SwingUtil;
 
 public class BankDiffPanel extends JPanel {
     static {
-        BufferedImage backIcon = ImageUtil.getResourceStreamFromClass(BankDiffPanel.class, "reverse_icon.png");
+        BufferedImage backIcon = ImageUtil.loadImageResource(BankDiffPanel.class, "reverse_icon.png");
         REVERSE_ICON = new ImageIcon(backIcon);
         REVERSE_ICON_HOVER = new ImageIcon(ImageUtil.alphaOffset(backIcon, -100));
     }

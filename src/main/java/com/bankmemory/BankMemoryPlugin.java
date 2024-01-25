@@ -25,18 +25,20 @@ import net.runelite.client.ui.ClientToolbar;
 import net.runelite.client.ui.NavigationButton;
 import net.runelite.client.util.ImageUtil;
 
-@PluginDescriptor(
-        name = Constants.BANK_MEMORY,
-        description = "A searchable record of what's in your bank"
-)
+@PluginDescriptor(name = Constants.BANK_MEMORY, description = "A searchable record of what's in your bank")
 public class BankMemoryPlugin extends Plugin {
     private static final String ICON = "bank_memory_icon.png";
 
-    @Inject private ClientToolbar clientToolbar;
-    @Inject private Client client;
-    @Inject private ClientThread clientThread;
-    @Inject private ItemManager itemManager;
-    @Inject private PluginDataStore dataStore;
+    @Inject
+    private ClientToolbar clientToolbar;
+    @Inject
+    private Client client;
+    @Inject
+    private ClientThread clientThread;
+    @Inject
+    private ItemManager itemManager;
+    @Inject
+    private PluginDataStore dataStore;
 
     private CurrentBankPanelController currentBankPanelController;
     private SavedBanksPanelController savedBanksPanelController;
@@ -49,11 +51,13 @@ public class BankMemoryPlugin extends Plugin {
     protected void startUp() throws Exception {
         assert SwingUtilities.isEventDispatchThread();
 
-        // Doing it here ensures it's created on the EDT + the instance is created after the client is all set up
-        // (The latter is important because otherwise lots of L&F values won't be set right and it'll look weird)
+        // Doing it here ensures it's created on the EDT + the instance is created after
+        // the client is all set up
+        // (The latter is important because otherwise lots of L&F values won't be set
+        // right and it'll look weird)
         BankMemoryPluginPanel pluginPanel = injector.getInstance(BankMemoryPluginPanel.class);
 
-        BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), ICON);
+        BufferedImage icon = ImageUtil.loadImageResource(getClass(), ICON);
         navButton = NavigationButton.builder()
                 .tooltip(Constants.BANK_MEMORY)
                 .icon(icon)
@@ -98,7 +102,7 @@ public class BankMemoryPlugin extends Plugin {
             String charName = player == null ? null : player.getName();
             if (charName != null) {
                 displayNameRegistered = true;
-                dataStore.registerDisplayNameForLogin(client.getUsername(), charName);
+                dataStore.registerDisplayNameForLogin(client.getLocalPlayer().getName(), charName);
             }
         }
     }
@@ -111,6 +115,6 @@ public class BankMemoryPlugin extends Plugin {
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
         ItemContainer bank = event.getItemContainer();
         currentBankPanelController.handleBankSave(
-                BankSave.fromCurrentBank(worldType, client.getUsername(), bank, itemManager));
+                BankSave.fromCurrentBank(worldType, client.getLocalPlayer().getName(), bank, itemManager));
     }
 }

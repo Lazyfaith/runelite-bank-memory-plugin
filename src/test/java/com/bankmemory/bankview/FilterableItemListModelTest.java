@@ -1,13 +1,5 @@
 package com.bankmemory.bankview;
 
-import com.google.common.collect.Lists;
-import java.awt.image.BufferedImage;
-import java.util.List;
-import javax.swing.event.ListDataListener;
-import net.runelite.client.util.AsyncBufferedImage;
-import org.junit.Test;
-
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
@@ -17,7 +9,23 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
+import java.awt.image.BufferedImage;
+import java.util.List;
+
+import javax.swing.event.ListDataListener;
+
+import org.junit.Test;
+
+import com.google.common.collect.Lists;
+import com.google.inject.Inject;
+
+import net.runelite.client.callback.ClientThread;
+import net.runelite.client.util.AsyncBufferedImage;
+
 public class FilterableItemListModelTest {
+
+    @Inject
+    private static ClientThread clientThread;
 
     private static final ItemListEntry dragonScimitar = item("Dragon Scimitar");
     private static final ItemListEntry runeAxe = item("Rune axe");
@@ -199,7 +207,8 @@ public class FilterableItemListModelTest {
     }
 
     private static ItemListEntry item(String name) {
-        return new ItemListEntry(name, 1, new AsyncBufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB), 1, 1);
+        return new ItemListEntry(name, 1, new AsyncBufferedImage(clientThread, 1, 1, BufferedImage.TYPE_INT_ARGB), 1,
+                1);
     }
 
     private static List<ItemListEntry> list(ItemListEntry... items) {

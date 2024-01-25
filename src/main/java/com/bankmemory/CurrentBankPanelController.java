@@ -23,14 +23,19 @@ import net.runelite.client.util.AsyncBufferedImage;
 
 @Slf4j
 public class CurrentBankPanelController {
-    @Inject private Client client;
-    @Inject private ClientThread clientThread;
-    @Inject private ItemManager itemManager;
-    @Inject private PluginDataStore dataStore;
+    @Inject
+    private Client client;
+    @Inject
+    private ClientThread clientThread;
+    @Inject
+    private ItemManager itemManager;
+    @Inject
+    private PluginDataStore dataStore;
 
     private BankViewPanel panel;
 
-    @Nullable private BankSave latestDisplayedData = null;
+    @Nullable
+    private BankSave latestDisplayedData = null;
 
     public void startUp(BankViewPanel panel) {
         assert client.isClientThread();
@@ -69,7 +74,7 @@ public class CurrentBankPanelController {
 
     private void updateDisplayForCurrentAccount() {
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
-        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, client.getUsername());
+        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, client.getLocalPlayer().getName());
         if (existingSave.isPresent()) {
             handleBankSave(existingSave.get());
         } else {
