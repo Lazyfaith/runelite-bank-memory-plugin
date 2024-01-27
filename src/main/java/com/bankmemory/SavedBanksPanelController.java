@@ -60,12 +60,12 @@ public class SavedBanksPanelController {
         DisplayNameMapper nameMapper = dataStore.getDisplayNameMapper();
 
         for (BankSave save : dataStore.getCurrentBanksList()) {
-            String displayName = nameMapper.map(save.getUserName());
+            String displayName = nameMapper.map(save.getAccountIdentifier());
             saves.add(new BanksListEntry(
                     save.getId(), casketIcon, save.getWorldType(), "Current bank", displayName, save.getDateTimeString()));
         }
         for (BankSave save : dataStore.getSnapshotBanksList()) {
-            String displayName = nameMapper.map(save.getUserName());
+            String displayName = nameMapper.map(save.getAccountIdentifier());
             saves.add(new BanksListEntry(
                     save.getId(), notedCasketIcon, save.getWorldType(), save.getSaveName(), displayName, save.getDateTimeString()));
         }

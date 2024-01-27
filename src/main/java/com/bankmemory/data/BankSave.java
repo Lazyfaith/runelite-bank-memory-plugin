@@ -3,6 +3,7 @@ package com.bankmemory.data;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
+import com.google.gson.annotations.SerializedName;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -25,20 +26,20 @@ public class BankSave {
     long id;
     BankWorldType worldType;
     String dateTimeString;
-    String userName;
+    @SerializedName(value = "accountIdentifier", alternate = {"userName"}) String accountIdentifier;
     @Nullable String saveName;
     ImmutableList<BankItem> itemData;
 
     @VisibleForTesting
     public BankSave(
             BankWorldType worldType,
-            String userName,
+            String accountIdentifier,
             @Nullable String saveName,
             String dateTimeString,
             ImmutableList<BankItem> itemData) {
         id = ID_BASE + idIncrementer.incrementAndGet();
         this.worldType = worldType;
-        this.userName = userName;
+        this.accountIdentifier = accountIdentifier;
         this.saveName = saveName;
         this.dateTimeString = dateTimeString;
         this.itemData = itemData;
@@ -51,7 +52,7 @@ public class BankSave {
 
     public static BankSave fromCurrentBank(
             BankWorldType worldType,
-            String userName,
+            String accountIdentifier,
             ItemContainer bank,
             ItemManager itemManager) {
         Objects.requireNonNull(bank);
@@ -71,7 +72,7 @@ public class BankSave {
             itemData.add(new BankItem(canonId, item.getQuantity()));
         }
         String timeString = DATE_FORMATTER.format(ZonedDateTime.now());
-        return new BankSave(worldType, userName, null, timeString, itemData.build());
+        return new BankSave(worldType, accountIdentifier, null, timeString, itemData.build());
     }
 
     private static boolean isItemToClean(int itemId) {
@@ -82,7 +83,7 @@ public class BankSave {
         Objects.requireNonNull(newName);
         return new BankSave(
                 existingBank.worldType,
-                existingBank.userName,
+                existingBank.accountIdentifier,
                 newName,
                 existingBank.dateTimeString,
                 existingBank.itemData);
@@ -97,7 +98,7 @@ public class BankSave {
 
         return new BankSave(
                 existingBank.worldType,
-                existingBank.userName,
+                existingBank.accountIdentifier,
                 existingBank.saveName,
                 existingBank.dateTimeString,
                 cleanItemData);
@@ -107,7 +108,7 @@ public class BankSave {
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("id", id)
-                .add("username", SAFER_USERNAME.from(userName))
+                .add("accountIdentifier", SAFER_USERNAME.from(accountIdentifier))
                 .add("dateTimeString", dateTimeString)
                 .add("saveName", saveName)
                 .add("itemData", itemData)

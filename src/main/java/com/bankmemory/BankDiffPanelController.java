@@ -49,7 +49,7 @@ public class BankDiffPanelController {
         DisplayNameMapper nameMapper = dataStore.getDisplayNameMapper();
 
         for (BankSave save : dataStore.getCurrentBanksList()) {
-            String displayName = nameMapper.map(save.getUserName());
+            String displayName = nameMapper.map(save.getAccountIdentifier());
             currentBanks.add(new BankDiffListOption(displayName, Type.CURRENT, save));
         }
         for (BankSave save : dataStore.getSnapshotBanksList()) {
@@ -83,7 +83,7 @@ public class BankDiffPanelController {
         switch (old.getBankType()) {
             case CURRENT:
                 return currentBanks.stream()
-                        .filter(b -> old.getSave().getUserName().equalsIgnoreCase(b.getSave().getUserName()))
+                        .filter(b -> old.getSave().getAccountIdentifier().equalsIgnoreCase(b.getSave().getAccountIdentifier()))
                         .findAny().orElse(null);
             case SNAPSHOT:
                 return snapshots.stream()

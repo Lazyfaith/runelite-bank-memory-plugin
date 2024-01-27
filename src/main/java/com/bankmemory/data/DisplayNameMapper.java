@@ -12,11 +12,11 @@ public class DisplayNameMapper {
         displayNamesByLogin.putAll(map);
     }
 
-    public String map(String username) {
-        String displayName = displayNamesByLogin.get(username);
+    public String map(String accountIdentifier) {
+        String displayName = displayNamesByLogin.get(accountIdentifier);
         if (displayName != null) {
             return displayName;
         }
-        return SAFER_USERNAME.from(username);
+        return SAFER_USERNAME.from(accountIdentifier);
     }
 }

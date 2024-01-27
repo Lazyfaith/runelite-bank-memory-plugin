@@ -72,7 +72,7 @@ public class PluginDataStore {
         }
         synchronized (dataLock) {
             return currentBankList.stream()
-                    .filter(s -> s.getWorldType() == worldType && s.getUserName().equalsIgnoreCase(login))
+                    .filter(s -> s.getWorldType() == worldType && s.getAccountIdentifier().equalsIgnoreCase(login))
                     .findAny();
         }
     }
@@ -109,7 +109,7 @@ public class PluginDataStore {
     private void saveAsCurrentBankImpl(BankSave newSave) {
         // Check if there is a current bank for existing login and remove it
         currentBankList.stream()
-                .filter(s -> s.getUserName().equalsIgnoreCase(newSave.getUserName())
+                .filter(s -> s.getAccountIdentifier().equalsIgnoreCase(newSave.getAccountIdentifier() )
                         && s.getWorldType() == newSave.getWorldType())
                 .findAny()
                 .ifPresent(currentBankList::remove);

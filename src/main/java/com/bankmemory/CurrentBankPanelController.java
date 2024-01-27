@@ -113,9 +113,9 @@ public class CurrentBankPanelController {
         if (latestDisplayedData == null) {
             return true;
         }
-        boolean userNamesSame = latestDisplayedData.getUserName().equalsIgnoreCase(newSave.getUserName());
+        boolean accountIdentifiersSame = latestDisplayedData.getAccountIdentifier().equalsIgnoreCase(newSave.getAccountIdentifier());
         boolean worldTypesSame = latestDisplayedData.getWorldType() == newSave.getWorldType();
-        return !userNamesSame || !worldTypesSame;
+        return !accountIdentifiersSame || !worldTypesSame;
     }
 
     private boolean isItemDataNew(BankSave newSave) {
