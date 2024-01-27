@@ -77,7 +77,7 @@ public class BankMemoryItemOverlay extends Overlay {
         if(existingSave.isPresent()) {
             for (BankItem bankItem: existingSave.get().getItemData()) {
                 if (bankItem.getItemId() == item.getId()) {
-                    itemCountTooltipText = "Stored: " + bankItem.getQuantity();
+                    itemCountTooltipText = "Banked: " + bankItem.getQuantity();
                     break;
                 }
             }
