@@ -4,15 +4,16 @@ import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;
+
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.widgets.WidgetInfo;
-import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayPriority;
@@ -53,7 +54,7 @@ public class BankMemoryItemOverlay extends Overlay {
         MenuEntry menuEntry = menuEntries[menuEntries.length - 1];
         int widgetId = menuEntry.getParam1();
 
-        if (widgetId != WidgetInfo.INVENTORY.getId()){
+        if (widgetId != WidgetInfo.INVENTORY.getId()) {
             return null;
         }
 
@@ -62,11 +63,8 @@ public class BankMemoryItemOverlay extends Overlay {
 
         ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
         Item item = inventory.getItem(index);
-        if (item == null){
+        if (item == null) {
             return null;
-        }
-        else{
-            item = inventory.getItem(index);
         }
 
         String itemCountTooltipText = null;
@@ -74,8 +72,8 @@ public class BankMemoryItemOverlay extends Overlay {
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
         Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, client.getUsername());
 
-        if(existingSave.isPresent()) {
-            for (BankItem bankItem: existingSave.get().getItemData()) {
+        if (existingSave.isPresent()) {
+            for (BankItem bankItem : existingSave.get().getItemData()) {
                 if (bankItem.getItemId() == item.getId()) {
                     itemCountTooltipText = "Banked: " + bankItem.getQuantity();
                     break;
@@ -84,7 +82,7 @@ public class BankMemoryItemOverlay extends Overlay {
         }
 
         if (itemCountTooltipText != null) {
-            tooltipManager.add(new Tooltip(itemCountTooltipText.toString()));
+            tooltipManager.add(new Tooltip(itemCountTooltipText));
         }
         return null;
     }

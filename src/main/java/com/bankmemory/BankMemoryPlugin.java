@@ -107,7 +107,6 @@ public class BankMemoryPlugin extends Plugin {
         if (gameStateChanged.getGameState() != GameState.LOGGED_IN) {
             displayNameRegistered = false;
         }
-
     }
 
     @Subscribe

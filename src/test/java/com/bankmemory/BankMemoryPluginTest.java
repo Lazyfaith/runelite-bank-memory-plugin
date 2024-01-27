@@ -11,6 +11,7 @@ import net.runelite.api.Client;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.ClientToolbar;
+import net.runelite.client.ui.overlay.OverlayManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,8 @@ public class BankMemoryPluginTest {
     @Mock @Bind private ClientThread clientThread;
     @Mock @Bind private ItemManager itemManager;
     @Mock @Bind private PluginDataStore pluginDataStore;
+    @Mock @Bind private BankMemoryConfig bankMemoryConfig;
+    @Mock @Bind private OverlayManager overlayManager;
     @Mock private CurrentBankPanelController currentBankPanelController;
     @Mock private SavedBanksPanelController savedBanksPanelController;
     @Mock private BankDiffPanelController bankDiffPanelController;

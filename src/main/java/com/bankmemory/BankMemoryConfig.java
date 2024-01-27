@@ -5,7 +5,7 @@ import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
 
 @ConfigGroup(BankMemoryPlugin.CONFIG_GROUP)
-public interface BankMemoryConfig extends Config{
+public interface BankMemoryConfig extends Config {
     @ConfigItem(
             position = 1,
             keyName = "itemCountTooltips",
@@ -15,5 +15,6 @@ public interface BankMemoryConfig extends Config{
     default boolean showTooltips() {
         return true;
     }
+
     void setTooltips(boolean tooltips);
 }
