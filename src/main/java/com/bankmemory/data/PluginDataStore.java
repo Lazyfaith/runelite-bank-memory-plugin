@@ -1,5 +1,6 @@
 package com.bankmemory.data;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -25,7 +26,8 @@ public class PluginDataStore {
     private final List<DataStoreUpdateListener> listeners = new ArrayList<>();
 
     @Inject
-    private PluginDataStore(ConfigReaderWriter configReaderWriter) {
+    @VisibleForTesting
+    PluginDataStore(ConfigReaderWriter configReaderWriter) {
         this.configReaderWriter = configReaderWriter;
         currentBankList = this.configReaderWriter.readCurrentBanks();
         snapshotBanksList = this.configReaderWriter.readBankSnapshots();

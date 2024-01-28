@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 public class AccountIdentifier {
 
-    private static final String ACCOUNT_HASH_ID_PREFIX = "accId#hash1#";
+    public static final String ACCOUNT_HASH_ID_PREFIX = "accId#hash1#";
 
     private AccountIdentifier() {}
 
