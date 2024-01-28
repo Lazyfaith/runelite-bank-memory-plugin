@@ -34,7 +34,7 @@ public class PluginDataStore {
         nameMap.putAll(this.configReaderWriter.readNameMap());
     }
 
-    public void registerDisplayNameForLogin(String accountIdentifier, String displayName) {
+    public void registerDisplayNameForAccountId(String accountIdentifier, String displayName) {
         List<DataStoreUpdateListener> listenersCopy;
         boolean changed;
         synchronized (dataLock) {

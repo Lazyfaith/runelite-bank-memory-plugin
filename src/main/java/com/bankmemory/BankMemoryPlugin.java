@@ -118,7 +118,7 @@ public class BankMemoryPlugin extends Plugin {
             String charName = player == null ? null : player.getName();
             if (accountIdentifier != null && charName != null) {
                 displayNameRegistered = true;
-                dataStore.registerDisplayNameForLogin(accountIdentifier, charName);
+                dataStore.registerDisplayNameForAccountId(accountIdentifier, charName);
             }
         }
     }

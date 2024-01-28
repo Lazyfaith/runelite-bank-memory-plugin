@@ -1,7 +1,6 @@
 package com.bankmemory.data;
 
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.testing.fieldbinder.Bind;
 import com.google.inject.testing.fieldbinder.BoundFieldModule;
 import org.junit.Before;
@@ -38,11 +37,11 @@ public class PluginDataStoreTest {
     }
 
     @Test
-    public void testRegisterDisplayNameForLogin_ifAccountIdIsNew_savesNewNameMapAndCallsListeners() {
+    public void testRegisterDisplayNameForAccountId_ifAccountIdIsNew_savesNewNameMapAndCallsListeners() {
         String accountId = AccountIdentifier.ACCOUNT_HASH_ID_PREFIX + "123";
         PluginDataStore pluginDataStore = createPluginDataStore();
 
-        pluginDataStore.registerDisplayNameForLogin(accountId, "CoolUsername");
+        pluginDataStore.registerDisplayNameForAccountId(accountId, "CoolUsername");
 
         verify(configReaderWriter).writeNameMap(Map.of(accountId, "CoolUsername"));
         verify(listener).displayNameMapUpdated();
@@ -50,24 +49,24 @@ public class PluginDataStoreTest {
     }
 
     @Test
-    public void testRegisterDisplayNameForLogin_ifUsernameRegisteredForAccountIdAlready_doesNothing() {
+    public void testRegisterDisplayNameForAccountId_ifUsernameRegisteredForAccountIdAlready_doesNothing() {
         String accountId = AccountIdentifier.ACCOUNT_HASH_ID_PREFIX + "123";
         when(configReaderWriter.readNameMap()).thenReturn(Map.of(accountId, "CoolUsername"));
         PluginDataStore pluginDataStore = createPluginDataStore();
 
-        pluginDataStore.registerDisplayNameForLogin(accountId, "CoolUsername");
+        pluginDataStore.registerDisplayNameForAccountId(accountId, "CoolUsername");
 
         verify(configReaderWriter, never()).writeNameMap(any());
         verifyNoInteractions(listener);
     }
 
     @Test
-    public void testRegisterDisplayNameForLogin_ifGivenUsernameIsDifferentToRegisteredOne_savesNewNameMapAndCallsListeners() {
+    public void testRegisterDisplayNameForAccountId_ifGivenUsernameIsDifferentToRegisteredOne_savesNewNameMapAndCallsListeners() {
         String accountId = AccountIdentifier.ACCOUNT_HASH_ID_PREFIX + "123";
         when(configReaderWriter.readNameMap()).thenReturn(Map.of(accountId, "OldUsername"));
         PluginDataStore pluginDataStore = createPluginDataStore();
 
-        pluginDataStore.registerDisplayNameForLogin(accountId, "NewUsername");
+        pluginDataStore.registerDisplayNameForAccountId(accountId, "NewUsername");
 
         verify(configReaderWriter).writeNameMap(Map.of(accountId, "NewUsername"));
         verify(listener).displayNameMapUpdated();
