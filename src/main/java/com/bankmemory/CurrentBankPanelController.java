@@ -2,6 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.bankview.BankViewPanel;
 import com.bankmemory.bankview.ItemListEntry;
+import com.bankmemory.data.AccountIdentifier;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
@@ -69,7 +70,8 @@ public class CurrentBankPanelController {
 
     private void updateDisplayForCurrentAccount() {
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
-        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, client.getUsername());
+        String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
+        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, accountIdentifier);
         if (existingSave.isPresent()) {
             handleBankSave(existingSave.get());
         } else {

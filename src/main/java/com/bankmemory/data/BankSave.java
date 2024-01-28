@@ -55,6 +55,7 @@ public class BankSave {
             String accountIdentifier,
             ItemContainer bank,
             ItemManager itemManager) {
+        Objects.requireNonNull(accountIdentifier);
         Objects.requireNonNull(bank);
         net.runelite.api.Item[] contents = bank.getItems();
         ImmutableList.Builder<BankItem> itemData = ImmutableList.builder();

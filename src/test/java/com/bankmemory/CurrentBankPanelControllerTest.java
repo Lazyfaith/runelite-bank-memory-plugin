@@ -2,6 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.bankview.BankViewPanel;
 import com.bankmemory.bankview.ItemListEntry;
+import com.bankmemory.data.AccountIdentifier;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
@@ -78,9 +79,10 @@ public class CurrentBankPanelControllerTest {
 
     @Test
     public void testStartup_ifLoggedInButNoDataForAccount_displayNoData() throws Exception {
+        String newStyleAccountId = AccountIdentifier.fromAccountHash(1337);
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
-        when(client.getUsername()).thenReturn("MrSam");
-        when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, "MrSam")).thenReturn(Optional.empty());
+        when(client.getAccountHash()).thenReturn(1337L);
+        when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, newStyleAccountId)).thenReturn(Optional.empty());
 
         currentBankPanelController.startUp(panel);
 
@@ -90,10 +92,11 @@ public class CurrentBankPanelControllerTest {
 
     @Test
     public void testStartup_ifLoggedInAndDataAvailable_displayAccountData() throws Exception {
+        String newStyleAccountId = AccountIdentifier.fromAccountHash(1337);
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
-        when(client.getUsername()).thenReturn("MrSam");
-        when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, "MrSam")).thenReturn(Optional.of(
-                new BankSave(BankWorldType.DEFAULT, "MrSam", "My Bank", "Tuesday",
+        when(client.getAccountHash()).thenReturn(1337L);
+        when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, newStyleAccountId)).thenReturn(Optional.of(
+                new BankSave(BankWorldType.DEFAULT, newStyleAccountId, "My Bank", "Tuesday",
                         ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)))));
 
         currentBankPanelController.startUp(panel);
@@ -108,11 +111,12 @@ public class CurrentBankPanelControllerTest {
 
     @Test
     public void testHandleBankSave_ifItemDataHasNotChangedThenOnlyUpdateTime() throws Exception {
+        String newStyleAccountId = AccountIdentifier.fromAccountHash(1337);
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
-        when(client.getUsername()).thenReturn("MrSam");
-        BankSave mondaySave = new BankSave(BankWorldType.DEFAULT, "MrSam", "My Bank", "Monday",
+        when(client.getAccountHash()).thenReturn(1337L);
+        BankSave mondaySave = new BankSave(BankWorldType.DEFAULT, newStyleAccountId, "My Bank", "Monday",
                 ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)));
-        BankSave tuesdaySave = new BankSave(BankWorldType.DEFAULT, "MrSam", "My Bank", "Tuesday", mondaySave.getItemData());
+        BankSave tuesdaySave = new BankSave(BankWorldType.DEFAULT, newStyleAccountId, "My Bank", "Tuesday", mondaySave.getItemData());
         currentBankPanelController.startUp(panel);
 
         verify(panel, never()).updateTimeDisplay(any());

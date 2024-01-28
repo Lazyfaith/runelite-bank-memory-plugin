@@ -1,13 +1,13 @@
 package com.bankmemory;
 
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+
+import com.bankmemory.data.AccountIdentifier;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;
-
-import java.awt.Dimension;
-import java.awt.Graphics2D;
-
 import net.runelite.api.Client;
 import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
@@ -70,7 +70,8 @@ public class BankMemoryItemOverlay extends Overlay {
         String itemCountTooltipText = null;
 
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
-        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, client.getUsername());
+        String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
+        Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, accountIdentifier);
 
         if (existingSave.isPresent()) {
             for (BankItem bankItem : existingSave.get().getItemData()) {

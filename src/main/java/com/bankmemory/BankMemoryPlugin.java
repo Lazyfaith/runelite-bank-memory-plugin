@@ -1,6 +1,7 @@
 package com.bankmemory;
 
 import com.bankmemory.bankview.BankViewPanel;
+import com.bankmemory.data.AccountIdentifier;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;
@@ -112,11 +113,12 @@ public class BankMemoryPlugin extends Plugin {
     @Subscribe
     public void onGameTick(GameTick event) {
         if (!displayNameRegistered) {
+            String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
             Player player = client.getLocalPlayer();
             String charName = player == null ? null : player.getName();
-            if (charName != null) {
+            if (accountIdentifier != null && charName != null) {
                 displayNameRegistered = true;
-                dataStore.registerDisplayNameForLogin(client.getUsername(), charName);
+                dataStore.registerDisplayNameForLogin(accountIdentifier, charName);
             }
         }
     }
@@ -128,7 +130,8 @@ public class BankMemoryPlugin extends Plugin {
         }
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
         ItemContainer bank = event.getItemContainer();
+        String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
         currentBankPanelController.handleBankSave(
-                BankSave.fromCurrentBank(worldType, client.getUsername(), bank, itemManager));
+                BankSave.fromCurrentBank(worldType, accountIdentifier, bank, itemManager));
     }
 }

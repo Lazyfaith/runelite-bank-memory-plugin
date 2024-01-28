@@ -32,12 +32,12 @@ public class PluginDataStore {
         nameMap.putAll(this.configReaderWriter.readNameMap());
     }
 
-    public void registerDisplayNameForLogin(String login, String displayName) {
+    public void registerDisplayNameForLogin(String accountIdentifier, String displayName) {
         List<DataStoreUpdateListener> listenersCopy;
         boolean changed;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
-            String oldValue = nameMap.put(login, displayName);
+            String oldValue = nameMap.put(accountIdentifier, displayName);
             changed = !Objects.equals(oldValue, displayName);
             if (changed) {
                 configReaderWriter.writeNameMap(nameMap);
@@ -66,13 +66,13 @@ public class PluginDataStore {
         }
     }
 
-    public Optional<BankSave> getDataForCurrentBank(BankWorldType worldType, String login) {
-        if (Strings.isNullOrEmpty(login)) {
+    public Optional<BankSave> getDataForCurrentBank(BankWorldType worldType, String accountIdentifier) {
+        if (Strings.isNullOrEmpty(accountIdentifier)) {
             return Optional.empty();
         }
         synchronized (dataLock) {
             return currentBankList.stream()
-                    .filter(s -> s.getWorldType() == worldType && s.getAccountIdentifier().equalsIgnoreCase(login))
+                    .filter(s -> s.getWorldType() == worldType && s.getAccountIdentifier().equalsIgnoreCase(accountIdentifier))
                     .findAny();
         }
     }
