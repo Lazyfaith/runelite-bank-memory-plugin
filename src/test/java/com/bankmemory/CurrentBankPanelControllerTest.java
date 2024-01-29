@@ -6,6 +6,7 @@ import com.bankmemory.data.AccountIdentifier;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
+import com.bankmemory.data.DataStoreUpdateListener;
 import com.bankmemory.data.PluginDataStore;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
@@ -26,6 +27,8 @@ import net.runelite.client.util.AsyncBufferedImage;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -48,6 +51,8 @@ public class CurrentBankPanelControllerTest {
     @Mock private BankViewPanel panel;
 
     @Inject private CurrentBankPanelController currentBankPanelController;
+
+    @Captor private ArgumentCaptor<DataStoreUpdateListener> dataStoreUpdateListenerArgumentCaptor;
 
     @Mock private AsyncBufferedImage coinsIcon;
     @Mock private AsyncBufferedImage burntLobsterIcon;
@@ -110,7 +115,7 @@ public class CurrentBankPanelControllerTest {
     }
 
     @Test
-    public void testHandleBankSave_ifItemDataHasNotChangedThenOnlyUpdateTime() throws Exception {
+    public void testDataStoreUpdateListener_whenCurrentBankListChanges_ifItemDataHasNotChangedThenOnlyUpdateTime() throws Exception {
         String newStyleAccountId = AccountIdentifier.fromAccountHash(1337);
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getAccountHash()).thenReturn(1337L);
@@ -121,8 +126,11 @@ public class CurrentBankPanelControllerTest {
 
         verify(panel, never()).updateTimeDisplay(any());
         verify(panel, never()).displayItemListings(any(), anyBoolean());
+        verify(dataStore).addListener(dataStoreUpdateListenerArgumentCaptor.capture());
 
-        currentBankPanelController.handleBankSave(mondaySave);
+        DataStoreUpdateListener listener = dataStoreUpdateListenerArgumentCaptor.getValue();
+        when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, newStyleAccountId)).thenReturn(Optional.of(mondaySave));
+        listener.currentBanksListChanged();
 
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Monday");
@@ -131,7 +139,8 @@ public class CurrentBankPanelControllerTest {
                 new ItemListEntry("Burnt lobster", 666, burntLobsterIcon, 66600, 6660))),
                 eq(true));
 
-        currentBankPanelController.handleBankSave(tuesdaySave);
+        when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, newStyleAccountId)).thenReturn(Optional.of(tuesdaySave));
+        listener.currentBanksListChanged();
 
         waitForEdtQueueToEmpty();
         verify(panel).updateTimeDisplay("Tuesday");

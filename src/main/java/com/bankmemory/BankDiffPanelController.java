@@ -2,6 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.BankDiffListOption.Type;
 import com.bankmemory.bankview.ItemListEntry;
+import com.bankmemory.data.AbstractDataStoreUpdateListener;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.data.DataStoreUpdateListener;
@@ -131,7 +132,7 @@ public class BankDiffPanelController {
         lastAfterSelection = null;
     }
 
-    private class DataUpdateListener implements DataStoreUpdateListener {
+    private class DataUpdateListener extends AbstractDataStoreUpdateListener {
         @Override
         public void currentBanksListChanged() {
             SwingUtilities.invokeLater(() -> updateForLatestBankData(true));

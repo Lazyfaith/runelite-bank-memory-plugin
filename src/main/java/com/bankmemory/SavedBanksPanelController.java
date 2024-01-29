@@ -170,6 +170,11 @@ public class SavedBanksPanelController {
         }
 
         @Override
+        public void currentBanksListOrderChanged() {
+            updateCurrentBanksList();
+        }
+
+        @Override
         public void snapshotBanksListChanged() {
             updateCurrentBanksList();
         }

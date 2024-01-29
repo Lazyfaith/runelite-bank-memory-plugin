@@ -131,7 +131,6 @@ public class BankMemoryPlugin extends Plugin {
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
         ItemContainer bank = event.getItemContainer();
         String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
-        currentBankPanelController.handleBankSave(
-                BankSave.fromCurrentBank(worldType, accountIdentifier, bank, itemManager));
+        dataStore.saveAsCurrentBank(BankSave.fromCurrentBank(worldType, accountIdentifier, bank, itemManager));
     }
 }

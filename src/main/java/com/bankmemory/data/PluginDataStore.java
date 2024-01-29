@@ -153,6 +153,28 @@ public class PluginDataStore {
         }
     }
 
+    public void currentBankViewed(long saveId) {
+        List<DataStoreUpdateListener> listenersCopy;
+        boolean changed = false;
+        synchronized (dataLock) {
+            listenersCopy = new ArrayList<>(listeners);
+
+            Optional<BankSave> save = this.currentBankList.stream().filter(s -> s.getId() == saveId).findFirst();
+            if (save.isPresent()) {
+                BankSave foundSave = save.get();
+                this.currentBankList.remove(foundSave);
+                this.currentBankList.add(0, foundSave);
+                configReaderWriter.writeCurrentBanks(currentBankList);
+                changed = true;
+            } else {
+                log.error("Claimed to view current bank with id " + saveId + " which wasn't found in list");
+            }
+        }
+        if (changed) {
+            listenersCopy.forEach(DataStoreUpdateListener::currentBanksListOrderChanged);
+        }
+    }
+
     public void saveAsCurrentBank(BankSave newSave) {
         List<DataStoreUpdateListener> listenersCopy;
         synchronized (dataLock) {

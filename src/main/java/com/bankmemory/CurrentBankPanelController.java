@@ -2,6 +2,7 @@ package com.bankmemory;
 
 import com.bankmemory.bankview.BankViewPanel;
 import com.bankmemory.bankview.ItemListEntry;
+import com.bankmemory.data.AbstractDataStoreUpdateListener;
 import com.bankmemory.data.AccountIdentifier;
 import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
@@ -39,6 +40,9 @@ public class CurrentBankPanelController {
         this.panel = panel;
         SwingUtilities.invokeLater(this::setPopupMenuActionOnBankView);
 
+        DataStoreListener dataStoreListener = new DataStoreListener();
+        dataStore.addListener(dataStoreListener);
+
         if (client.getGameState() == GameState.LOGGED_IN) {
             updateDisplayForCurrentAccount();
         } else {
@@ -73,25 +77,25 @@ public class CurrentBankPanelController {
         String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
         Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, accountIdentifier);
         if (existingSave.isPresent()) {
-            handleBankSave(existingSave.get());
+            viewBankSave(existingSave.get());
         } else {
             latestDisplayedData = null;
             SwingUtilities.invokeLater(panel::displayNoDataMessage);
         }
     }
 
-    public void handleBankSave(BankSave newSave) {
+    private void viewBankSave(BankSave bankSave) {
         assert client.isClientThread();
 
-        dataStore.saveAsCurrentBank(newSave);
+        dataStore.currentBankViewed(bankSave.getId());
 
-        boolean shouldReset = isBankIdentityDifferentToLastDisplayed(newSave);
-        boolean shouldUpdateItemsDisplay = shouldReset || isItemDataNew(newSave);
+        boolean shouldReset = isBankIdentityDifferentToLastDisplayed(bankSave);
+        boolean shouldUpdateItemsDisplay = shouldReset || isItemDataNew(bankSave);
         List<ItemListEntry> items = new ArrayList<>();
         if (shouldUpdateItemsDisplay) {
             // Get all the data we need for the UI on this thread (the game thread)
             // Doing it on the EDT seems to cause random crashes & NPEs
-            for (BankItem i : newSave.getItemData()) {
+            for (BankItem i : bankSave.getItemData()) {
                 ItemComposition ic = itemManager.getItemComposition(i.getItemId());
                 AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
                 int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
@@ -103,12 +107,12 @@ public class CurrentBankPanelController {
             if (shouldReset) {
                 panel.reset();
             }
-            panel.updateTimeDisplay(newSave.getDateTimeString());
+            panel.updateTimeDisplay(bankSave.getDateTimeString());
             if (shouldUpdateItemsDisplay) {
                 panel.displayItemListings(items, true);
             }
         });
-        latestDisplayedData = newSave;
+        latestDisplayedData = bankSave;
     }
 
     private boolean isBankIdentityDifferentToLastDisplayed(BankSave newSave) {
@@ -122,5 +126,12 @@ public class CurrentBankPanelController {
 
     private boolean isItemDataNew(BankSave newSave) {
         return latestDisplayedData == null || !latestDisplayedData.getItemData().equals(newSave.getItemData());
+    }
+
+    private class DataStoreListener extends AbstractDataStoreUpdateListener {
+        @Override
+        public void currentBanksListChanged() {
+            updateDisplayForCurrentAccount();
+        }
     }
 }
