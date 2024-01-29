@@ -105,6 +105,16 @@ public class BankSave {
                 cleanItemData);
     }
 
+    public static BankSave withNewAccountId(String newAccountId, BankSave existingBank) {
+        Objects.requireNonNull(newAccountId);
+        return new BankSave(
+                existingBank.worldType,
+                newAccountId,
+                existingBank.saveName,
+                existingBank.dateTimeString,
+                existingBank.itemData);
+    }
+
     @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)

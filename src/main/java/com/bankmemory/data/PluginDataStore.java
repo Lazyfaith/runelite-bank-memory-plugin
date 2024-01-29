@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
@@ -36,18 +37,71 @@ public class PluginDataStore {
 
     public void registerDisplayNameForAccountId(String accountIdentifier, String displayName) {
         List<DataStoreUpdateListener> listenersCopy;
-        boolean changed;
+        boolean nameMapChanged;
+        boolean savesChanged = false;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
+            Set<Map.Entry<String, String>> oldNameMapEntries = nameMap.entrySet();
+
+            // Registering new display name for account ID
             String oldValue = nameMap.put(accountIdentifier, displayName);
-            changed = !Objects.equals(oldValue, displayName);
-            if (changed) {
+            nameMapChanged = !Objects.equals(oldValue, displayName);
+            if (nameMapChanged) {
                 configReaderWriter.writeNameMap(nameMap);
             }
+
+            // Claim existing bank saves for new style account ID if necessary
+            if (nameMapChanged) {
+                Optional<String> oldStyleIdRegisteredForDisplayName = oldNameMapEntries.stream()
+                        .filter(e -> !e.getKey().startsWith(AccountIdentifier.ACCOUNT_HASH_ID_PREFIX))
+                        .filter(e -> e.getValue().equals(displayName))
+                        .findFirst()
+                        .map(Map.Entry::getKey);
+                if (oldStyleIdRegisteredForDisplayName.isPresent()) {
+                    savesChanged = this.claimExistingSavesForNewAccountId(oldStyleIdRegisteredForDisplayName.get(), accountIdentifier);
+                }
+            }
         }
-        if (changed) {
+        if (nameMapChanged) {
             listenersCopy.forEach(DataStoreUpdateListener::displayNameMapUpdated);
         }
+        if (savesChanged) {
+            listenersCopy.forEach(DataStoreUpdateListener::currentBanksListChanged);
+            listenersCopy.forEach(DataStoreUpdateListener::snapshotBanksListChanged);
+        }
+    }
+
+    private boolean claimExistingSavesForNewAccountId(String oldAccountId, String newAccountId) {
+        boolean currentBankSavesChanged = false;
+        boolean snapshotBankSavesChanged = false;
+
+        synchronized (dataLock) {
+            for (int i = 0; i < this.currentBankList.size(); i++) {
+                BankSave existingSave = this.currentBankList.get(i);
+                if (existingSave.getAccountIdentifier().equals(oldAccountId)) {
+                    BankSave reclaimedSave = BankSave.withNewAccountId(newAccountId, existingSave);
+                    this.currentBankList.set(i, reclaimedSave);
+                    currentBankSavesChanged = true;
+                }
+            }
+            for (int i = 0; i < this.snapshotBanksList.size(); i++) {
+                BankSave existingSave = this.snapshotBanksList.get(i);
+                if (existingSave.getAccountIdentifier().equals(oldAccountId)) {
+                    BankSave reclaimedSave = BankSave.withNewAccountId(newAccountId, existingSave);
+                    this.snapshotBanksList.set(i, reclaimedSave);
+                    snapshotBankSavesChanged = true;
+                }
+            }
+
+            if (currentBankSavesChanged) {
+                this.configReaderWriter.writeCurrentBanks(this.currentBankList);
+            }
+            if (snapshotBankSavesChanged) {
+                this.configReaderWriter.writeBankSnapshots(this.snapshotBanksList);
+            }
+        }
+
+        return currentBankSavesChanged || snapshotBankSavesChanged;
     }
 
     public DisplayNameMapper getDisplayNameMapper() {
