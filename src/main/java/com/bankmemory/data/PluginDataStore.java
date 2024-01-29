@@ -187,21 +187,24 @@ public class PluginDataStore {
 
     public void deleteBankSaveWithId(long saveId) {
         List<DataStoreUpdateListener> listenersCopy;
-        boolean changed = false;
+        boolean currentBanksChanged = false;
+        boolean snapshotBanksChanged = false;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
 
             if (PluginDataStore.removeBankSaveWithIdFromList(saveId, currentBankList)) {
                 configReaderWriter.writeCurrentBanks(currentBankList);
-                changed = true;
+                currentBanksChanged = true;
             }
             if (PluginDataStore.removeBankSaveWithIdFromList(saveId, snapshotBanksList)) {
                 configReaderWriter.writeBankSnapshots(snapshotBanksList);
-                changed = true;
+                snapshotBanksChanged = true;
             }
         }
-        if (changed) {
+        if (currentBanksChanged) {
             listenersCopy.forEach(DataStoreUpdateListener::currentBanksListChanged);
+        } else if (snapshotBanksChanged) {
+            listenersCopy.forEach(DataStoreUpdateListener::snapshotBanksListChanged);
         } else {
             log.error("Tried deleting missing bank save: {}", saveId);
         }
