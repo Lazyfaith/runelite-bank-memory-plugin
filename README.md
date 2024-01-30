@@ -17,6 +17,10 @@ A plugin for [RuneLite](https://github.com/runelite/runelite) which remembers th
 
 ## Version history
 
+- v1.3.0
+  - Added item tooltip in inventory stating how many of that item you have stored in your bank (thank you, Fiffers)
+  - Updated for new Runelite APIs (thank you, YvesW)
+  - Bug fix - Now works if you log in with a Jagex account
 - v1.2.0
   - Add ability to export bank item data in TSV format (Hint: right click to open context menu)
   - Filter out null items from item lists
