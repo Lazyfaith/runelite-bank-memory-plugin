@@ -26,15 +26,16 @@ class ConfigReaderWriter {
     private static final String SNAPSHOT_LIST_KEY = "snapshotList";
     private static final String NAME_MAP_KEY = "nameMap";
 
+    private final Gson gson;
     private final ConfigManager configManager;
-    private final ItemDataParser itemDataParser;
 
     private final BlockingQueue<ConfigWrite> configWritesQueue = new LinkedBlockingQueue<>();
 
     @Inject
-    ConfigReaderWriter(ConfigManager configManager, ItemDataParser itemDataParser) {
+    ConfigReaderWriter(Gson gson, ConfigManager configManager) {
+        Type itemDataListType = new TypeToken<ImmutableList<BankItem>>() {}.getType();
+        this.gson = gson.newBuilder().registerTypeAdapter(itemDataListType, new ItemDataParser()).create();
         this.configManager = configManager;
-        this.itemDataParser = itemDataParser;
 
         Thread configWriter = new Thread(new ConfigWriter(), "Bank Memory config writer");
         configWriter.setDaemon(true);
@@ -77,11 +78,6 @@ class ConfigReaderWriter {
         scheduleConfigWrite(write);
     }
 
-    private Gson buildGson() {
-        Type itemDataListType = new TypeToken<ImmutableList<BankItem>>() {}.getType();
-        return new GsonBuilder().registerTypeAdapter(itemDataListType, itemDataParser).create();
-    }
-
     private <T> T loadDataFromConfig(String configKey, Type deserialiseType, T defaultInstance, String dataName) {
         String jsonString = configManager.getConfiguration(PLUGIN_BASE_GROUP, configKey);
         if (jsonString == null) {
@@ -89,7 +85,6 @@ class ConfigReaderWriter {
             return defaultInstance;
         }
 
-        Gson gson = buildGson();
         try {
             T loadedData = gson.fromJson(jsonString, deserialiseType);
             return loadedData == null ? defaultInstance : loadedData;
@@ -125,7 +120,6 @@ class ConfigReaderWriter {
     private class ConfigWriter implements Runnable {
         @Override
         public void run() {
-            Gson gson = buildGson();
             while (!Thread.interrupted()) {
                 ConfigWrite write;
                 try {
