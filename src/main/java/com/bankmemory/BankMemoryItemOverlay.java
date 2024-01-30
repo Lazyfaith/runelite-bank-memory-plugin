@@ -13,7 +13,7 @@ import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.MenuEntry;
-import net.runelite.api.widgets.WidgetInfo;
+import net.runelite.api.widgets.ComponentID;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.OverlayPriority;
@@ -54,7 +54,7 @@ public class BankMemoryItemOverlay extends Overlay {
         MenuEntry menuEntry = menuEntries[menuEntries.length - 1];
         int widgetId = menuEntry.getParam1();
 
-        if (widgetId != WidgetInfo.INVENTORY.getId()) {
+        if (widgetId != ComponentID.INVENTORY_CONTAINER) {
             return null;
         }
 
