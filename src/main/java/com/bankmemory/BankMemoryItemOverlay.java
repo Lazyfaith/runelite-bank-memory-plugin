@@ -14,6 +14,7 @@ import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.MenuEntry;
 import net.runelite.api.widgets.ComponentID;
+import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
@@ -24,15 +25,17 @@ import java.util.Optional;
 
 public class BankMemoryItemOverlay extends Overlay {
     private final Client client;
+    private final ItemManager itemManager;
     private final BankMemoryConfig config;
     private final TooltipManager tooltipManager;
     private final PluginDataStore dataStore;
 
     @Inject
-    BankMemoryItemOverlay(Client client, BankMemoryConfig config, TooltipManager tooltipManager, PluginDataStore dataStore) {
+    BankMemoryItemOverlay(Client client, ItemManager itemManager, BankMemoryConfig config, TooltipManager tooltipManager, PluginDataStore dataStore) {
         setPosition(OverlayPosition.TOOLTIP);
         setPriority(0f);
         this.client = client;
+        this.itemManager = itemManager;
         this.config = config;
         this.tooltipManager = tooltipManager;
         this.dataStore = dataStore;
@@ -72,9 +75,10 @@ public class BankMemoryItemOverlay extends Overlay {
         String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
         Optional<BankSave> existingSave = dataStore.getDataForCurrentBank(worldType, accountIdentifier);
 
+        int itemCanonId = itemManager.canonicalize(item.getId());
         if (existingSave.isPresent()) {
             for (BankItem bankItem : existingSave.get().getItemData()) {
-                if (bankItem.getItemId() == item.getId()) {
+                if (bankItem.getItemId() == itemCanonId) {
                     itemCountTooltipText = "Banked: " + bankItem.getQuantity();
                     break;
                 }
