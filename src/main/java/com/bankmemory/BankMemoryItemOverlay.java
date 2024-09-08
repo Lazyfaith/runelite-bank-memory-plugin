@@ -9,11 +9,11 @@ import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;
 import net.runelite.api.Client;
-import net.runelite.api.InventoryID;
 import net.runelite.api.Item;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.MenuEntry;
-import net.runelite.api.widgets.ComponentID;
+import net.runelite.api.gameval.InterfaceID;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
@@ -47,7 +47,7 @@ public class BankMemoryItemOverlay extends Overlay {
             return null;
         }
 
-        MenuEntry[] menuEntries = client.getMenuEntries();
+        MenuEntry[] menuEntries = client.getMenu().getMenuEntries();
 
         if (menuEntries.length < 1) {
             return null;
@@ -56,14 +56,14 @@ public class BankMemoryItemOverlay extends Overlay {
         MenuEntry menuEntry = menuEntries[menuEntries.length - 1];
         int widgetId = menuEntry.getParam1();
 
-        if (widgetId != ComponentID.INVENTORY_CONTAINER) {
+        if (widgetId != InterfaceID.Inventory.ITEMS) {
             return null;
         }
 
         int index = menuEntry.getParam0();
 
 
-        ItemContainer inventory = client.getItemContainer(InventoryID.INVENTORY);
+        ItemContainer inventory = client.getItemContainer(InventoryID.INV);
         Item item = inventory.getItem(index);
         if (item == null) {
             return null;

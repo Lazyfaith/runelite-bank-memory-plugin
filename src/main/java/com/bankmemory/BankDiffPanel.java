@@ -31,7 +31,7 @@ import net.runelite.client.util.SwingUtil;
 
 public class BankDiffPanel extends JPanel {
     static {
-        BufferedImage backIcon = ImageUtil.getResourceStreamFromClass(BankDiffPanel.class, "reverse_icon.png");
+        BufferedImage backIcon = ImageUtil.loadImageResource(BankDiffPanel.class, "reverse_icon.png");
         REVERSE_ICON = new ImageIcon(backIcon);
         REVERSE_ICON_HOVER = new ImageIcon(ImageUtil.alphaOffset(backIcon, -100));
     }

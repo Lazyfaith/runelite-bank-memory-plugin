@@ -16,7 +16,7 @@ import net.runelite.client.util.SwingUtil;
 
 public class BankSavesTopPanel extends JPanel {
     static {
-        BufferedImage backIcon = ImageUtil.getResourceStreamFromClass(BankSavesTopPanel.class, "back_icon.png");
+        BufferedImage backIcon = ImageUtil.loadImageResource(BankSavesTopPanel.class, "back_icon.png");
         BACK_ICON = new ImageIcon(backIcon);
         BACK_ICON_HOVER = new ImageIcon(ImageUtil.alphaOffset(backIcon, -100));
     }

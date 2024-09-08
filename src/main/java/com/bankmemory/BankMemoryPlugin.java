@@ -12,12 +12,12 @@ import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.InventoryID;
 import net.runelite.api.ItemContainer;
 import net.runelite.api.Player;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.ItemContainerChanged;
+import net.runelite.api.gameval.InventoryID;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
@@ -69,7 +69,7 @@ public class BankMemoryPlugin extends Plugin {
         // (The latter is important because otherwise lots of L&F values won't be set right and it'll look weird)
         BankMemoryPluginPanel pluginPanel = injector.getInstance(BankMemoryPluginPanel.class);
 
-        BufferedImage icon = ImageUtil.getResourceStreamFromClass(getClass(), ICON);
+        BufferedImage icon = ImageUtil.loadImageResource(getClass(), ICON);
         navButton = NavigationButton.builder()
                 .tooltip(Constants.BANK_MEMORY)
                 .icon(icon)
@@ -125,7 +125,7 @@ public class BankMemoryPlugin extends Plugin {
 
     @Subscribe
     public void onItemContainerChanged(ItemContainerChanged event) {
-        if (event.getContainerId() != InventoryID.BANK.getId()) {
+        if (event.getContainerId() != InventoryID.BANK) {
             return;
         }
         BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());

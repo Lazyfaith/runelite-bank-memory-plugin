@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.annotation.Nullable;
 import lombok.Value;
 import net.runelite.api.ItemContainer;
-import net.runelite.api.ItemID;
+import net.runelite.api.gameval.ItemID;
 import net.runelite.client.game.ItemManager;
 
 @Value
