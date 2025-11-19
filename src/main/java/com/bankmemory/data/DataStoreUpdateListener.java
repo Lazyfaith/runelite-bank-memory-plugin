@@ -8,4 +8,11 @@ public interface DataStoreUpdateListener {
     void snapshotBanksListChanged();
 
     void displayNameMapUpdated();
+
+    // Seed vault specific notifications
+    default void currentSeedVaultsListChanged() {}
+
+    default void currentSeedVaultsListOrderChanged() {}
+
+    default void snapshotSeedVaultsListChanged() {}
 }

@@ -24,6 +24,8 @@ class ConfigReaderWriter {
     private static final String PLUGIN_BASE_GROUP = "bankMemory";
     private static final String CURRENT_LIST_KEY = "currentList";
     private static final String SNAPSHOT_LIST_KEY = "snapshotList";
+    private static final String CURRENT_SEED_VAULT_LIST_KEY = "currentSeedVaultList";
+    private static final String SNAPSHOT_SEED_VAULT_LIST_KEY = "snapshotSeedVaultList";
     private static final String NAME_MAP_KEY = "nameMap";
 
     private final Gson gson;
@@ -65,6 +67,28 @@ class ConfigReaderWriter {
 
     void writeBankSnapshots(List<BankSave> banks) {
         ConfigWrite configWrite = new ConfigWrite(PLUGIN_BASE_GROUP, SNAPSHOT_LIST_KEY, new ArrayList<>(banks));
+        scheduleConfigWrite(configWrite);
+    }
+
+    List<BankSave> readCurrentSeedVaults() {
+        Type deserialiseType = new TypeToken<List<BankSave>>() {}.getType();
+        List<BankSave> fromDataStore = loadDataFromConfig(CURRENT_SEED_VAULT_LIST_KEY, deserialiseType, new ArrayList<>(), "Current seed vault list");
+        return upgradeBankSaves(fromDataStore);
+    }
+
+    void writeCurrentSeedVaults(List<BankSave> vaults) {
+        ConfigWrite configWrite = new ConfigWrite(PLUGIN_BASE_GROUP, CURRENT_SEED_VAULT_LIST_KEY, new ArrayList<>(vaults));
+        scheduleConfigWrite(configWrite);
+    }
+
+    List<BankSave> readSeedVaultSnapshots() {
+        Type deserialiseType = new TypeToken<List<BankSave>>() {}.getType();
+        List<BankSave> fromDataStore = loadDataFromConfig(SNAPSHOT_SEED_VAULT_LIST_KEY, deserialiseType, new ArrayList<>(), "Snapshot seed vault list");
+        return upgradeBankSaves(fromDataStore);
+    }
+
+    void writeSeedVaultSnapshots(List<BankSave> vaults) {
+        ConfigWrite configWrite = new ConfigWrite(PLUGIN_BASE_GROUP, SNAPSHOT_SEED_VAULT_LIST_KEY, new ArrayList<>(vaults));
         scheduleConfigWrite(configWrite);
     }
 

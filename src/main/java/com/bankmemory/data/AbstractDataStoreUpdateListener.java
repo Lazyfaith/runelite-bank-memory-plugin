@@ -20,4 +20,19 @@ public abstract class AbstractDataStoreUpdateListener implements DataStoreUpdate
     public void displayNameMapUpdated() {
         // NO OP
     }
+
+    @Override
+    public void currentSeedVaultsListChanged() {
+        // NO OP
+    }
+
+    @Override
+    public void currentSeedVaultsListOrderChanged() {
+        // NO OP
+    }
+
+    @Override
+    public void snapshotSeedVaultsListChanged() {
+        // NO OP
+    }
 }

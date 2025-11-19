@@ -23,6 +23,8 @@ public class PluginDataStore {
     private final Map<String, String> nameMap = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
     private final List<BankSave> currentBankList;
     private final List<BankSave> snapshotBanksList;
+    private final List<BankSave> currentSeedVaultList;
+    private final List<BankSave> snapshotSeedVaultsList;
     private final ConfigReaderWriter configReaderWriter;
     private final List<DataStoreUpdateListener> listeners = new ArrayList<>();
 
@@ -32,6 +34,8 @@ public class PluginDataStore {
         this.configReaderWriter = configReaderWriter;
         currentBankList = this.configReaderWriter.readCurrentBanks();
         snapshotBanksList = this.configReaderWriter.readBankSnapshots();
+        currentSeedVaultList = this.configReaderWriter.readCurrentSeedVaults();
+        snapshotSeedVaultsList = this.configReaderWriter.readSeedVaultSnapshots();
         nameMap.putAll(this.configReaderWriter.readNameMap());
     }
 
@@ -74,6 +78,8 @@ public class PluginDataStore {
     private boolean claimExistingSavesForNewAccountId(String oldAccountId, String newAccountId) {
         boolean currentBankSavesChanged = false;
         boolean snapshotBankSavesChanged = false;
+        boolean currentSeedVaultSavesChanged = false;
+        boolean snapshotSeedVaultSavesChanged = false;
 
         synchronized (dataLock) {
             for (int i = 0; i < this.currentBankList.size(); i++) {
@@ -93,15 +99,38 @@ public class PluginDataStore {
                 }
             }
 
+            for (int i = 0; i < this.currentSeedVaultList.size(); i++) {
+                BankSave existingSave = this.currentSeedVaultList.get(i);
+                if (existingSave.getAccountIdentifier().equals(oldAccountId)) {
+                    BankSave reclaimedSave = BankSave.withNewAccountId(newAccountId, existingSave);
+                    this.currentSeedVaultList.set(i, reclaimedSave);
+                    currentSeedVaultSavesChanged = true;
+                }
+            }
+            for (int i = 0; i < this.snapshotSeedVaultsList.size(); i++) {
+                BankSave existingSave = this.snapshotSeedVaultsList.get(i);
+                if (existingSave.getAccountIdentifier().equals(oldAccountId)) {
+                    BankSave reclaimedSave = BankSave.withNewAccountId(newAccountId, existingSave);
+                    this.snapshotSeedVaultsList.set(i, reclaimedSave);
+                    snapshotSeedVaultSavesChanged = true;
+                }
+            }
+
             if (currentBankSavesChanged) {
                 this.configReaderWriter.writeCurrentBanks(this.currentBankList);
             }
             if (snapshotBankSavesChanged) {
                 this.configReaderWriter.writeBankSnapshots(this.snapshotBanksList);
             }
+            if (currentSeedVaultSavesChanged) {
+                this.configReaderWriter.writeCurrentSeedVaults(this.currentSeedVaultList);
+            }
+            if (snapshotSeedVaultSavesChanged) {
+                this.configReaderWriter.writeSeedVaultSnapshots(this.snapshotSeedVaultsList);
+            }
         }
 
-        return currentBankSavesChanged || snapshotBankSavesChanged;
+        return currentBankSavesChanged || snapshotBankSavesChanged || currentSeedVaultSavesChanged || snapshotSeedVaultSavesChanged;
     }
 
     public DisplayNameMapper getDisplayNameMapper() {
@@ -145,9 +174,22 @@ public class PluginDataStore {
         }
     }
 
+    public List<BankSave> getCurrentSeedVaultsList() {
+        synchronized (dataLock) {
+            return new ArrayList<>(currentSeedVaultList);
+        }
+    }
+
+    public List<BankSave> getSnapshotSeedVaultsList() {
+        synchronized (dataLock) {
+            return new ArrayList<>(snapshotSeedVaultsList);
+        }
+    }
+
     public Optional<BankSave> getBankSaveWithId(long id) {
         synchronized (dataLock) {
-            return Stream.concat(currentBankList.stream(), snapshotBanksList.stream())
+            return Stream.of(currentBankList.stream(), snapshotBanksList.stream(), currentSeedVaultList.stream(), snapshotSeedVaultsList.stream())
+                    .flatMap(s -> s)
                     .filter(s -> s.getId() == id)
                     .findFirst();
         }
@@ -175,6 +217,39 @@ public class PluginDataStore {
         }
     }
 
+    public void currentSeedVaultViewed(long saveId) {
+        List<DataStoreUpdateListener> listenersCopy;
+        boolean changed = false;
+        synchronized (dataLock) {
+            listenersCopy = new ArrayList<>(listeners);
+
+            Optional<BankSave> save = this.currentSeedVaultList.stream().filter(s -> s.getId() == saveId).findFirst();
+            if (save.isPresent()) {
+                BankSave foundSave = save.get();
+                this.currentSeedVaultList.remove(foundSave);
+                this.currentSeedVaultList.add(0, foundSave);
+                configReaderWriter.writeCurrentSeedVaults(currentSeedVaultList);
+                changed = true;
+            } else {
+                log.error("Claimed to view current seed vault with id " + saveId + " which wasn't found in list");
+            }
+        }
+        if (changed) {
+            listenersCopy.forEach(DataStoreUpdateListener::currentSeedVaultsListOrderChanged);
+        }
+    }
+
+    public Optional<BankSave> getDataForCurrentSeedVault(BankWorldType worldType, String accountIdentifier) {
+        if (Strings.isNullOrEmpty(accountIdentifier)) {
+            return Optional.empty();
+        }
+        synchronized (dataLock) {
+            return currentSeedVaultList.stream()
+                    .filter(s -> s.getWorldType() == worldType && s.getAccountIdentifier().equalsIgnoreCase(accountIdentifier))
+                    .findAny();
+        }
+    }
+
     public void saveAsCurrentBank(BankSave newSave) {
         List<DataStoreUpdateListener> listenersCopy;
         synchronized (dataLock) {
@@ -197,6 +272,22 @@ public class PluginDataStore {
         configReaderWriter.writeCurrentBanks(currentBankList);
     }
 
+    public void saveAsCurrentSeedVault(BankSave newSave) {
+    List<DataStoreUpdateListener> listenersCopy;
+    synchronized (dataLock) {
+        listenersCopy = new ArrayList<>(listeners);
+        // remove existing for account/world
+        currentSeedVaultList.stream()
+            .filter(s -> s.getAccountIdentifier().equalsIgnoreCase(newSave.getAccountIdentifier())
+                && s.getWorldType() == newSave.getWorldType())
+            .findAny()
+            .ifPresent(currentSeedVaultList::remove);
+        currentSeedVaultList.add(0, newSave);
+        configReaderWriter.writeCurrentSeedVaults(currentSeedVaultList);
+    }
+    listenersCopy.forEach(DataStoreUpdateListener::currentSeedVaultsListChanged);
+    }
+
     public void saveAsSnapshotBank(String newName, BankSave existingSave) {
         List<DataStoreUpdateListener> listenersCopy;
         synchronized (dataLock) {
@@ -207,10 +298,22 @@ public class PluginDataStore {
         listenersCopy.forEach(DataStoreUpdateListener::snapshotBanksListChanged);
     }
 
+    public void saveAsSnapshotSeedVault(String newName, BankSave existingSave) {
+        List<DataStoreUpdateListener> listenersCopy;
+        synchronized (dataLock) {
+            listenersCopy = new ArrayList<>(listeners);
+            snapshotSeedVaultsList.add(0, BankSave.snapshotFromExistingBank(newName, existingSave));
+            configReaderWriter.writeSeedVaultSnapshots(snapshotSeedVaultsList);
+        }
+        listenersCopy.forEach(DataStoreUpdateListener::snapshotSeedVaultsListChanged);
+    }
+
     public void deleteBankSaveWithId(long saveId) {
         List<DataStoreUpdateListener> listenersCopy;
         boolean currentBanksChanged = false;
         boolean snapshotBanksChanged = false;
+        boolean currentSeedVaultsChanged = false;
+        boolean snapshotSeedVaultsChanged = false;
         synchronized (dataLock) {
             listenersCopy = new ArrayList<>(listeners);
 
@@ -222,11 +325,23 @@ public class PluginDataStore {
                 configReaderWriter.writeBankSnapshots(snapshotBanksList);
                 snapshotBanksChanged = true;
             }
+            if (PluginDataStore.removeBankSaveWithIdFromList(saveId, currentSeedVaultList)) {
+                configReaderWriter.writeCurrentSeedVaults(currentSeedVaultList);
+                currentSeedVaultsChanged = true;
+            }
+            if (PluginDataStore.removeBankSaveWithIdFromList(saveId, snapshotSeedVaultsList)) {
+                configReaderWriter.writeSeedVaultSnapshots(snapshotSeedVaultsList);
+                snapshotSeedVaultsChanged = true;
+            }
         }
         if (currentBanksChanged) {
             listenersCopy.forEach(DataStoreUpdateListener::currentBanksListChanged);
         } else if (snapshotBanksChanged) {
             listenersCopy.forEach(DataStoreUpdateListener::snapshotBanksListChanged);
+        } else if (currentSeedVaultsChanged) {
+            listenersCopy.forEach(DataStoreUpdateListener::currentSeedVaultsListChanged);
+        } else if (snapshotSeedVaultsChanged) {
+            listenersCopy.forEach(DataStoreUpdateListener::snapshotSeedVaultsListChanged);
         } else {
             log.error("Tried deleting missing bank save: {}", saveId);
         }

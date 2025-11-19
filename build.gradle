@@ -29,7 +29,18 @@ dependencies {
 group = 'com.bankmemory'
 version = '1.3.0'
 
+// Ensure we compile against Java 11 (RuneLite target) regardless of the system JDK
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(11)
+    }
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
     options.release.set(11)
 }
+

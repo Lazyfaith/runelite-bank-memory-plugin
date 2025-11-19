@@ -26,28 +26,27 @@ import net.runelite.client.ui.ColorScheme;
 import net.runelite.client.ui.FontManager;
 import net.runelite.client.ui.components.PluginErrorPanel;
 
-
-public class BanksListPanel extends JPanel {
+public class SeedVaultsListPanel extends JPanel {
 
     private static final String DELETE_SAVE = "Delete save...";
     private static final String SAVE_SNAPSHOT = "Save snapshot...";
 
     private final PluginErrorPanel noDataMessage;
     private final JPanel listPanel;
-    private final JPopupMenu bankEntryContextMenu;
+    private final JPopupMenu entryContextMenu;
     private final ListEntryMouseListener mouseListener;
-    private BanksListInteractionListener interactionListener;
+    private SeedVaultsListInteractionListener interactionListener;
 
-    public BanksListPanel() {
+    public SeedVaultsListPanel() {
         super();
         mouseListener = new ListEntryMouseListener();
-        bankEntryContextMenu = createContextMenu();
+        entryContextMenu = createContextMenu();
 
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createEmptyBorder(Constants.PAD, 0, Constants.PAD, 0));
 
         noDataMessage = new PluginErrorPanel();
-        noDataMessage.setContent("No bank saves", "You currently do not have any bank saves.");
+        noDataMessage.setContent("No seed vault saves", "You currently do not have any seed vault saves.");
         add(noDataMessage, BorderLayout.NORTH);
 
         listPanel = new JPanel(new GridBagLayout());
@@ -56,9 +55,9 @@ public class BanksListPanel extends JPanel {
         JScrollPane scrollPane = new JScrollPane(listWrapper);
         add(scrollPane, BorderLayout.CENTER);
 
-        JButton compareBanks = new JButton("Compare saves");
-        compareBanks.addActionListener(a -> interactionListener.openBanksDiffPanel());
-        add(compareBanks, BorderLayout.SOUTH);
+        JButton compareSaves = new JButton("Compare seed vault saves");
+        compareSaves.addActionListener(a -> interactionListener.openSeedVaultsDiffPanel());
+        add(compareSaves, BorderLayout.SOUTH);
     }
 
     private JPopupMenu createContextMenu() {
@@ -76,7 +75,7 @@ public class BanksListPanel extends JPanel {
                 String inputName;
                 do {
                     inputName = JOptionPane.showInputDialog(
-                            BanksListPanel.this, "Enter name for new bank snapshot:", "Save Snapshot As", JOptionPane.PLAIN_MESSAGE);
+                            SeedVaultsListPanel.this, "Enter name for new seed vault snapshot:", "Save Snapshot As", JOptionPane.PLAIN_MESSAGE);
                     if (inputName == null) {
                         return;
                     }
@@ -84,7 +83,7 @@ public class BanksListPanel extends JPanel {
                 } while (inputName.isEmpty());
 
                 BanksListEntry save = ((EntryPanel) menu.getInvoker()).entry;
-                interactionListener.saveBankAs(save, inputName);
+                interactionListener.saveSeedVaultAs(save, inputName);
             }
         };
     }
@@ -94,7 +93,7 @@ public class BanksListPanel extends JPanel {
             @Override
             public void actionPerformed(ActionEvent e) {
                 BanksListEntry save = ((EntryPanel) menu.getInvoker()).entry;
-                interactionListener.copyBankSaveItemDataToClipboard(save);
+                interactionListener.copySeedVaultSaveItemDataToClipboard(save);
             }
         };
     }
@@ -105,7 +104,7 @@ public class BanksListPanel extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 String message = "Are you sure you want to delete this save?";
                 int result = JOptionPane.showConfirmDialog(
-                        BanksListPanel.this, message, Constants.BANK_MEMORY, JOptionPane.YES_NO_OPTION);
+                        SeedVaultsListPanel.this, message, Constants.BANK_MEMORY, JOptionPane.YES_NO_OPTION);
                 if (result == JOptionPane.YES_OPTION) {
                     BanksListEntry save = ((EntryPanel) menu.getInvoker()).entry;
                     interactionListener.selectedToDelete(save);
@@ -114,23 +113,23 @@ public class BanksListPanel extends JPanel {
         };
     }
 
-    public void setInteractionListener(BanksListInteractionListener listener) {
+    public void setInteractionListener(SeedVaultsListInteractionListener listener) {
         interactionListener = listener;
     }
 
-    public void updateBanksList(List<BanksListEntry> entries) {
+    public void updateVaultsList(List<BanksListEntry> entries) {
         listPanel.removeAll();
 
         noDataMessage.setVisible(entries.isEmpty());
         if (!entries.isEmpty()) {
-            displayListOfBanks(entries);
+            displayList(entries);
         }
 
         revalidate();
         repaint();
     }
 
-    private void displayListOfBanks(List<BanksListEntry> entries) {
+    private void displayList(List<BanksListEntry> entries) {
         GridBagConstraints c = new GridBagConstraints();
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
@@ -156,7 +155,7 @@ public class BanksListPanel extends JPanel {
             setBackground(ColorScheme.DARKER_GRAY_COLOR);
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
             setToolTipText(entry.getDateTime());
-            setComponentPopupMenu(bankEntryContextMenu);
+            setComponentPopupMenu(entryContextMenu);
 
             GridBagConstraints c = new GridBagConstraints();
             c.gridx = 0;
@@ -204,8 +203,6 @@ public class BanksListPanel extends JPanel {
                 BanksListEntry entryClicked = ((EntryPanel) e.getComponent()).entry;
                 interactionListener.selectedToOpen(entryClicked);
 
-                // mouseExited won't trigger if the interaction listener changes the view entirely,
-                // so trigger manually if needed
                 if (!e.getComponent().contains(MouseInfo.getPointerInfo().getLocation())) {
                     mouseExited(e);
                 }

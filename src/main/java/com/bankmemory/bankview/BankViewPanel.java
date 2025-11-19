@@ -91,6 +91,14 @@ public class BankViewPanel extends JPanel {
     }
 
     /**
+     * Customize the title and message shown when there is no data to display.
+     * Call this before {@link #displayNoDataMessage()}.
+     */
+    public void setNoDataMessage(String title, String message) {
+        errorPanel.setContent(title, message);
+    }
+
+    /**
      * Resets filter, resets list data, resets scroll position and removes UI components.
      * Indirectly: releases some held objects (by resetting the list).
      */
