@@ -101,8 +101,8 @@ public class CurrentBankPanelControllerTest {
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getAccountHash()).thenReturn(1337L);
         when(dataStore.getDataForCurrentBank(BankWorldType.DEFAULT, newStyleAccountId)).thenReturn(Optional.of(
-                new BankSave(BankWorldType.DEFAULT, newStyleAccountId, "My Bank", "Tuesday",
-                        ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)))));
+                new BankSave(BankWorldType.DEFAULT, newStyleAccountId, "My Bank",
+                        "Tuesday", ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)))));
 
         currentBankPanelController.startUp(panel);
 
@@ -119,8 +119,8 @@ public class CurrentBankPanelControllerTest {
         String newStyleAccountId = AccountIdentifier.fromAccountHash(1337);
         when(client.getGameState()).thenReturn(GameState.LOGGED_IN);
         when(client.getAccountHash()).thenReturn(1337L);
-        BankSave mondaySave = new BankSave(BankWorldType.DEFAULT, newStyleAccountId, "My Bank", "Monday",
-                ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)));
+        BankSave mondaySave = new BankSave(BankWorldType.DEFAULT, newStyleAccountId, "My Bank",
+                "Monday", ImmutableList.of(new BankItem(0, 100), new BankItem(2, 666)));
         BankSave tuesdaySave = new BankSave(BankWorldType.DEFAULT, newStyleAccountId, "My Bank", "Tuesday", mondaySave.getItemData());
         currentBankPanelController.startUp(panel);
 

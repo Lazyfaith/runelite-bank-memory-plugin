@@ -17,4 +17,23 @@ public interface BankMemoryConfig extends Config {
     }
 
     void setTooltips(boolean tooltips);
+
+    @ConfigItem(
+            position = 2,
+            keyName = "minValue",
+            name = "Minimum stack value",
+            description = "Minimum item stack GE value to display"
+    )
+    default int minValue() {
+        return 0;
+    }
+    @ConfigItem(
+            position = 3,
+            keyName = "sortMode",
+            name = "Sort mode",
+            description = "Mode to sort the displayed items"
+    )
+    default SortMode sortMode() {
+        return SortMode.DEFAULT;
+    }
 }

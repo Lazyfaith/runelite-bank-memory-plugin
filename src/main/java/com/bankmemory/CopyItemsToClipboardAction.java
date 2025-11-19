@@ -1,5 +1,6 @@
 package com.bankmemory;
 
+import com.bankmemory.data.BankItem;
 import com.bankmemory.data.BankSave;
 import com.bankmemory.util.ClipboardActions;
 import com.bankmemory.util.Constants;
@@ -14,11 +15,13 @@ public abstract class CopyItemsToClipboardAction extends AbstractAction {
 
     private final ClientThread clientThread;
     private final ItemManager itemManager;
+    private final BankMemoryConfig config;
 
-    CopyItemsToClipboardAction(ClientThread clientThread, ItemManager itemManager) {
+    CopyItemsToClipboardAction(ClientThread clientThread, ItemManager itemManager,BankMemoryConfig config) {
         super(Constants.ACTION_COPY_ITEM_DATA_TO_CLIPBOARD);
         this.clientThread = Objects.requireNonNull(clientThread);
         this.itemManager = Objects.requireNonNull(itemManager);
+        this.config = config;
     }
 
     @Override
@@ -27,8 +30,7 @@ public abstract class CopyItemsToClipboardAction extends AbstractAction {
         if (data == null) {
             return;
         }
-
-        ClipboardActions.copyItemDataAsTsvToClipboardOnClientThread(clientThread, itemManager, data.getItemData());
+        ClipboardActions.copyItemDataAsTsvToClipboardOnClientThread(clientThread, itemManager, config, data.getItemData());
     }
 
     @Nullable

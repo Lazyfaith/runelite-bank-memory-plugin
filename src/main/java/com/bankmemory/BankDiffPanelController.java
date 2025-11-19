@@ -9,6 +9,8 @@ import com.bankmemory.data.DataStoreUpdateListener;
 import com.bankmemory.data.DisplayNameMapper;
 import com.bankmemory.data.PluginDataStore;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
@@ -27,6 +29,7 @@ public class BankDiffPanelController {
     @Inject private ItemManager itemManager;
     @Inject private PluginDataStore dataStore;
     @Inject private ItemListDiffGenerator diffGenerator;
+    @Inject BankMemoryConfig config;
 
     private BankDiffPanel diffPanel;
     private DataUpdateListener dataListener;
@@ -120,7 +123,17 @@ public class BankDiffPanelController {
             AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), false);
             int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
             int haValue = ic.getHaPrice() * i.getQuantity();
-            items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
+
+            if (Math.abs(geValue) >= config.minValue()) {
+                items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
+            }
+        }
+
+        if (config.sortMode() == SortMode.VALUE) {
+            items.sort((item1, item2) -> {
+                // Sort by geValue in descending order, use absolute values because removed items are displayed as negatives
+                return Integer.compare(Math.abs(item2.getGeValue()), Math.abs(item1.getGeValue()));
+            });
         }
 
         SwingUtilities.invokeLater(() -> diffPanel.displayItems(items, keepListPosition));

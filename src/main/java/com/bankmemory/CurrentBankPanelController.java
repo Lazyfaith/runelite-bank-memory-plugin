@@ -29,6 +29,8 @@ public class CurrentBankPanelController {
     @Inject private ClientThread clientThread;
     @Inject private ItemManager itemManager;
     @Inject private PluginDataStore dataStore;
+    @Inject BankMemoryConfig config;
+    @Inject BankMemoryPlugin plugin;
 
     private BankViewPanel panel;
 
@@ -51,7 +53,7 @@ public class CurrentBankPanelController {
     }
 
     private void setPopupMenuActionOnBankView() {
-        this.panel.setItemListPopupMenuAction(new CopyItemsToClipboardAction(clientThread, itemManager) {
+        this.panel.setItemListPopupMenuAction(new CopyItemsToClipboardAction(clientThread, itemManager, config) {
             @Nullable
             @Override
             public BankSave getBankItemData() {
@@ -84,13 +86,18 @@ public class CurrentBankPanelController {
         }
     }
 
+    private boolean hasConfigUpdated() //if config has updated reload the list in case people change the min value/sort mode
+    {
+        return plugin.isConfigChanged();
+    }
+
     private void viewBankSave(BankSave bankSave) {
         assert client.isClientThread();
 
         dataStore.currentBankViewed(bankSave.getId());
 
         boolean shouldReset = isBankIdentityDifferentToLastDisplayed(bankSave);
-        boolean shouldUpdateItemsDisplay = shouldReset || isItemDataNew(bankSave);
+        boolean shouldUpdateItemsDisplay = shouldReset || isItemDataNew(bankSave) || hasConfigUpdated();
         List<ItemListEntry> items = new ArrayList<>();
         if (shouldUpdateItemsDisplay) {
             // Get all the data we need for the UI on this thread (the game thread)
@@ -100,9 +107,19 @@ public class CurrentBankPanelController {
                 AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
                 int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
                 int haValue = ic.getHaPrice() * i.getQuantity();
-                items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
+                if (Math.abs(geValue) >= config.minValue()) {
+                    items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
+                }
             }
         }
+
+        if (config.sortMode() == SortMode.VALUE) {
+            items.sort((item1, item2) -> {
+                // Sort by geValue in descending order, use absolute values because removed items are displayed as negatives
+                return Integer.compare(Math.abs(item2.getGeValue()), Math.abs(item1.getGeValue()));
+            });
+        }
+
         SwingUtilities.invokeLater(() -> {
             if (shouldReset) {
                 panel.reset();
@@ -110,6 +127,7 @@ public class CurrentBankPanelController {
             panel.updateTimeDisplay(bankSave.getDateTimeString());
             if (shouldUpdateItemsDisplay) {
                 panel.displayItemListings(items, true);
+                plugin.setConfigChanged(false); //we've used the value, set it back to false
             }
         });
         latestDisplayedData = bankSave;

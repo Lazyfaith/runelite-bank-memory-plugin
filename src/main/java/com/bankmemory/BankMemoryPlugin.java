@@ -8,8 +8,12 @@ import com.bankmemory.data.PluginDataStore;
 import com.bankmemory.util.Constants;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
+import java.util.Objects;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
+
+import lombok.Getter;
+import lombok.Setter;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
 import net.runelite.api.InventoryID;
@@ -21,6 +25,7 @@ import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.callback.ClientThread;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
+import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
@@ -56,6 +61,10 @@ public class BankMemoryPlugin extends Plugin {
     private NavigationButton navButton;
     private boolean displayNameRegistered = false;
 
+    @Getter
+    @Setter
+    private boolean configChanged;
+
     @Provides
     BankMemoryConfig provideConfig(ConfigManager configManager) {
         return configManager.getConfig(BankMemoryConfig.class);
@@ -89,6 +98,7 @@ public class BankMemoryPlugin extends Plugin {
         diffPanelController.startUp(pluginPanel.getSavedBanksTopPanel().getDiffPanel());
 
         overlayManager.add(itemOverlay);
+        setConfigChanged(false);
     }
 
     @Override
@@ -107,6 +117,14 @@ public class BankMemoryPlugin extends Plugin {
         currentBankPanelController.onGameStateChanged(gameStateChanged);
         if (gameStateChanged.getGameState() != GameState.LOGGED_IN) {
             displayNameRegistered = false;
+        }
+    }
+
+    @Subscribe
+    public void onConfigChanged(ConfigChanged configChanged)
+    {
+        if (Objects.equals(configChanged.getGroup(), CONFIG_GROUP)) {
+            setConfigChanged(true);
         }
     }
 
