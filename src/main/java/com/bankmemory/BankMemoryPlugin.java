@@ -124,7 +124,7 @@ public class BankMemoryPlugin extends Plugin {
             }
         }
 
-        if (stallBankSave != -1 && stallBankSave-- == 0)
+        if (stallBankSave != -1 && --stallBankSave == 0)
         {
             BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
             String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
@@ -138,6 +138,6 @@ public class BankMemoryPlugin extends Plugin {
             return;
         }
         bankCache = event.getItemContainer();
-        stallBankSave = 2;
+        stallBankSave = 3;
     }
 }
