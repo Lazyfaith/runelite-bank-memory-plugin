@@ -55,6 +55,8 @@ public class BankMemoryPlugin extends Plugin {
     private BankDiffPanelController diffPanelController;
     private NavigationButton navButton;
     private boolean displayNameRegistered = false;
+    private int stallBankSave = -1;
+    private ItemContainer bankCache;
 
     @Provides
     BankMemoryConfig provideConfig(ConfigManager configManager) {
@@ -121,6 +123,13 @@ public class BankMemoryPlugin extends Plugin {
                 dataStore.registerDisplayNameForAccountId(accountIdentifier, charName);
             }
         }
+
+        if (stallBankSave != -1 && stallBankSave-- == 0)
+        {
+            BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
+            String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
+            dataStore.saveAsCurrentBank(BankSave.fromCurrentBank(worldType, accountIdentifier, bankCache, itemManager));
+        }
     }
 
     @Subscribe
@@ -128,9 +137,7 @@ public class BankMemoryPlugin extends Plugin {
         if (event.getContainerId() != InventoryID.BANK) {
             return;
         }
-        BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
-        ItemContainer bank = event.getItemContainer();
-        String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
-        dataStore.saveAsCurrentBank(BankSave.fromCurrentBank(worldType, accountIdentifier, bank, itemManager));
+        bankCache = event.getItemContainer();
+        stallBankSave = 2;
     }
 }
