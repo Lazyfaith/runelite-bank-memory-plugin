@@ -8,6 +8,6 @@ public class ItemListEntry {
     String itemName;
     int quantity;
     AsyncBufferedImage image;
-    int geValue;
-    int haValue;
+    long geValue;
+    long haValue;
 }
