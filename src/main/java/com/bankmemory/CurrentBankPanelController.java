@@ -98,8 +98,8 @@ public class CurrentBankPanelController {
             for (BankItem i : bankSave.getItemData()) {
                 ItemComposition ic = itemManager.getItemComposition(i.getItemId());
                 AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), i.getQuantity() > 1);
-                int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
-                int haValue = ic.getHaPrice() * i.getQuantity();
+                long geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
+                long haValue = (long) ic.getHaPrice() * i.getQuantity();
                 items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
             }
         }

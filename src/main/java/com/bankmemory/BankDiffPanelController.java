@@ -118,8 +118,8 @@ public class BankDiffPanelController {
             ItemComposition ic = itemManager.getItemComposition(i.getItemId());
             // Quantity num is painted by renderer, but still give quantity so item stacks show nicely
             AsyncBufferedImage icon = itemManager.getImage(i.getItemId(), i.getQuantity(), false);
-            int geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
-            int haValue = ic.getHaPrice() * i.getQuantity();
+            long geValue = itemManager.getItemPrice(i.getItemId()) * i.getQuantity();
+            long haValue = (long) ic.getHaPrice() * i.getQuantity();
             items.add(new ItemListEntry(ic.getName(), i.getQuantity(), icon, geValue, haValue));
         }
 

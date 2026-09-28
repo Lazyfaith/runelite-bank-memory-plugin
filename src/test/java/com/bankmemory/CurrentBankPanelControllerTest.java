@@ -68,8 +68,8 @@ public class CurrentBankPanelControllerTest {
         when(itemManager.getItemComposition(2)).thenReturn(burntLobster);
         when(itemManager.getImage(eq(0), anyInt(), anyBoolean())).thenReturn(coinsIcon);
         when(itemManager.getImage(eq(2), anyInt(), anyBoolean())).thenReturn(burntLobsterIcon);
-        when(itemManager.getItemPrice(0)).thenReturn(1);
-        when(itemManager.getItemPrice(2)).thenReturn(100);
+        when(itemManager.getItemPrice(0)).thenReturn(1L);
+        when(itemManager.getItemPrice(2)).thenReturn(100L);
     }
 
     @Test
