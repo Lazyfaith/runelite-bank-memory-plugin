@@ -16,7 +16,6 @@ import net.runelite.api.MenuEntry;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayPosition;
-import net.runelite.client.ui.overlay.OverlayPriority;
 import net.runelite.client.ui.overlay.tooltip.Tooltip;
 import net.runelite.client.ui.overlay.tooltip.TooltipManager;
 
@@ -31,8 +30,8 @@ public class BankMemoryItemOverlay extends Overlay {
 
     @Inject
     BankMemoryItemOverlay(Client client, BankMemoryConfig config, TooltipManager tooltipManager, PluginDataStore dataStore) {
-        setPosition(OverlayPosition.DYNAMIC);
-        setPriority(OverlayPriority.HIGHEST);
+        setPosition(OverlayPosition.TOOLTIP);
+        setPriority(0f);
         this.client = client;
         this.config = config;
         this.tooltipManager = tooltipManager;
