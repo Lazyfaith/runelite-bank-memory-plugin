@@ -6,13 +6,13 @@ import com.bankmemory.data.BankSave;
 import com.bankmemory.data.BankWorldType;
 import com.bankmemory.data.PluginDataStore;
 import com.bankmemory.util.Constants;
+import com.bankmemory.util.TickDebouncer;
 import com.google.inject.Provides;
 import java.awt.image.BufferedImage;
 import javax.inject.Inject;
 import javax.swing.SwingUtilities;
 import net.runelite.api.Client;
 import net.runelite.api.GameState;
-import net.runelite.api.ItemContainer;
 import net.runelite.api.Player;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
@@ -55,8 +55,7 @@ public class BankMemoryPlugin extends Plugin {
     private BankDiffPanelController diffPanelController;
     private NavigationButton navButton;
     private boolean displayNameRegistered = false;
-    private int stallBankSave = -1;
-    private ItemContainer bankCache;
+    private final TickDebouncer currentBankSaveDebouncer = new TickDebouncer(3);
 
     @Provides
     BankMemoryConfig provideConfig(ConfigManager configManager) {
@@ -109,6 +108,9 @@ public class BankMemoryPlugin extends Plugin {
         currentBankPanelController.onGameStateChanged(gameStateChanged);
         if (gameStateChanged.getGameState() != GameState.LOGGED_IN) {
             displayNameRegistered = false;
+
+            // In case user logs outs before any waiting action gets to trigger
+            this.currentBankSaveDebouncer.flush();
         }
     }
 
@@ -124,12 +126,7 @@ public class BankMemoryPlugin extends Plugin {
             }
         }
 
-        if (stallBankSave != -1 && --stallBankSave == 0)
-        {
-            BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
-            String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
-            dataStore.saveAsCurrentBank(BankSave.fromCurrentBank(worldType, accountIdentifier, bankCache, itemManager));
-        }
+        this.currentBankSaveDebouncer.tick();
     }
 
     @Subscribe
@@ -137,7 +134,10 @@ public class BankMemoryPlugin extends Plugin {
         if (event.getContainerId() != InventoryID.BANK) {
             return;
         }
-        bankCache = event.getItemContainer();
-        stallBankSave = 3;
+        this.currentBankSaveDebouncer.start(() -> {
+            BankWorldType worldType = BankWorldType.forWorld(client.getWorldType());
+            String accountIdentifier = AccountIdentifier.fromAccountHash(client.getAccountHash());
+            dataStore.saveAsCurrentBank(BankSave.fromCurrentBank(worldType, accountIdentifier, event.getItemContainer(), itemManager));
+        });
     }
 }
