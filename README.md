@@ -17,6 +17,10 @@ A plugin for [RuneLite](https://github.com/runelite/runelite) which remembers th
 
 ## Version history
 
+- v1.3.1
+  - Prevent lag when withdrawing items from bank (thank you, NFB)
+  - Updated for new Runelite APIs (thank you, pr0f3ss)
+  - Bug fix - Noted items now display correct number of banked items in tooltip
 - v1.3.0
   - Added item tooltip in inventory stating how many of that item you have stored in your bank (thank you, Fiffers)
   - Updated for new Runelite APIs (thank you, YvesW)
